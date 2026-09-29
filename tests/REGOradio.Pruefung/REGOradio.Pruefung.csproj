@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <!-- Das geprüfte Projekt ist ein WPF-Programm; ohne diese Zeile findet der
+         Prüfläufer die XAML-Typen nicht. -->
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\REGOradio\REGOradio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Aufgezeichnete Antworten: Keine Prüfung greift ins
+         Netz und keine fragt echte Hardware. Was hier liegt, ist am Gerät
+         abgelesen. -->
+    <None Include="antworten\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <!-- Für das Tray-Symbol. Windows hat dafür nur den Weg über
+         System.Windows.Forms.NotifyIcon; eine Fremdbibliothek für ein Symbol
+         einzubinden wäre ein Paket zu viel. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>REGOradio</AssemblyName>
+    <RootNamespace>REGOradio</RootNamespace>
+    <!-- Deutsch ist die Sprache dieses Projekts, auch in Meldungen. -->
+    <NeutralLanguage>de-DE</NeutralLanguage>
+    <!-- Das Symbol der .exe (Explorer, Taskleiste, Startmenü). Gezeichnet von
+         werkzeug/symbol-zeichnen.ps1 – die .ico ist dessen Ergebnis. -->
+    <ApplicationIcon>symbol.ico</ApplicationIcon>
+    <Version>0.1.6</Version>
+    <Product>REGOradio</Product>
+    <Copyright>© 2026 Stephan Ruf</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Dasselbe Symbol als WPF-Ressource: für das Fenster und das Tray. -->
+    <Resource Include="symbol.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- MIT. Der Entwurf verbietet GPL/LGPL-Klientbibliotheken;
+         NAudio erfüllt das, libVLC nicht. -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <!-- MIT. Zeichnet den QR-Code für die Handy-Fernbedienung als PNG, ohne
+         System.Drawing. -->
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+    <PackageReference Include="System.Management" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Der kleine Webdienst für die Handy-Fernbedienung (Kestrel). Teil von
+         .NET selbst, kein Fremdpaket. Er bindet an alle Adressen, ohne dass
+         Windows dafür Administratorrechte verlangt – anders als HttpListener,
+         der für alles außer localhost eine URL-Reservierung braucht. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Die Seite fürs Handy, in die .exe eingebettet: eine Datei, kein
+         Bauschritt, kein Node. -->
+    <EmbeddedResource Include="Fernbedienung\Handyseite.html" LogicalName="Handyseite.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WinForms nur für das Tray-Symbol, nicht als globaler Namensraum. Mit
+         `UseWindowsForms` setzt .NET `System.Windows.Forms` und `System.Drawing`
+         automatisch als globale usings – und dann sind Button, MessageBox,
+         Application und Color zwischen WPF und WinForms doppeldeutig. Wer
+         WinForms braucht (`Traysymbol.cs`), holt es sich ausdrücklich. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F6F5C">
+<title>REGOradio</title>
+<!--
+  Die Fernbedienung fürs Handy. Eine Datei, eingebettet in die REGOradio.exe:
+  kein Bauschritt, keine Fremdquellen -- sie lädt auch, wenn das Hotel-WLAN
+  gerade kein Internet durchlässt.
+
+  Aufbau in Karten, Dunkelmodus
+  nach der Einstellung des Handys), Farben von REGOradio.
+
+  Sie kann bewusst wenig: Sender wählen, Lautstärke, Stumm, Stopp, dazu umschalten,
+  was der Notebook-Bildschirm zeigt, und seine Helligkeit (hinter dem Zahnrad). Was mehr
+  braucht, geschieht am Notebook.
+-->
+<style>
+  :root {
+    --grund: #F4F2EE; --flaeche: #FFFFFF; --flaeche-2: #EAE7E1;
+    --linie: #D6D2CA; --linie-stark: #B8B2A7;
+    --tinte: #1C1B19; --tinte-2: #565249; --tinte-3: #6F6A5F;
+    --akzent: #1F6F5C; --akzent-weich: #DCEBE5; --akzent-tinte: #FFFFFF;
+    --fehler: #9A3B26;
+    --radius: 14px;
+    --schrift: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --grund: #0E0F10; --flaeche: #17191B; --flaeche-2: #1F2225;
+      --linie: #2C3034; --linie-stark: #3E4449;
+      --tinte: #D8D4CC; --tinte-2: #A29D93; --tinte-3: #8A857C;
+      --akzent: #5FA790; --akzent-weich: #1B2A26; --akzent-tinte: #0E0F10;
+      --fehler: #C9765E;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--grund); color: var(--tinte); font-family: var(--schrift); }
+  body { padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+  [hidden] { display: none !important; }
+
+  .kopf { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px; }
+  .kopf b { font-size: 20px; }
+  .kopf .rechts { display: flex; align-items: center; gap: 12px; }
+  .zahnrad { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--linie-stark);
+             background: var(--flaeche-2); display: flex; align-items: center; justify-content: center; padding: 0; }
+  .zahnrad svg { stroke: var(--tinte-2); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .zahnrad.an { background: var(--akzent-weich); border-color: var(--akzent); }
+  .zahnrad.an svg { stroke: var(--akzent); }
+
+  /* Was der Notebook-Bildschirm zeigt: ein Umschalter mit drei Segmenten. */
+  .ansicht { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px;
+             border-radius: 14px; background: var(--flaeche-2); border: 1px solid var(--linie-stark); }
+  .ansicht button { height: 44px; border: none; border-radius: 10px; background: transparent;
+                    font-size: 15px; font-weight: 600; }
+  .ansicht button.an { background: var(--akzent); color: var(--akzent-tinte); }
+  .ansicht button:disabled { opacity: .35; }
+  .punkt { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--tinte-2); }
+  .punkt i { width: 9px; height: 9px; border-radius: 50%; background: var(--akzent); }
+  .punkt.weg i { background: var(--fehler); }
+
+  .karte { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--radius); padding: 16px; }
+
+  /* Was läuft */
+  .jetzt { display: grid; grid-template-columns: 76px 1fr; gap: 14px; align-items: center; }
+  .bild { width: 76px; height: 76px; border-radius: 12px; background: var(--flaeche-2); overflow: hidden;
+          display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; color: #fff; }
+  .bild img { width: 100%; height: 100%; object-fit: cover; }
+  .bild.logo { background: #fff; }
+  .bild.logo img { object-fit: contain; padding: 8px; }
+  .jetzt .klein { font-size: 12px; font-weight: 700; letter-spacing: .05em; color: var(--akzent); }
+  .jetzt .titel { font-size: 18px; font-weight: 700; margin-top: 2px; line-height: 1.25;
+                  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .jetzt .zweit { font-size: 15px; color: var(--tinte-2); margin-top: 2px;
+                  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Lautstärke: groß. Am Handy ist das der Handgriff, für den man es aus
+     der Tasche holt. */
+  .laut { display: grid; grid-template-columns: 64px 1fr 64px; gap: 12px; align-items: center; }
+  .laut button.rund { height: 64px; border-radius: 16px; border: 1px solid var(--linie-stark);
+                      background: var(--flaeche-2); font-size: 30px; line-height: 1; }
+  .laut button.rund:active { background: var(--akzent-weich); border-color: var(--akzent); }
+  .wert { text-align: center; }
+  .wert b { font-size: 40px; font-variant-numeric: tabular-nums; display: block; line-height: 1.1; }
+  .wert span { font-size: 13px; color: var(--tinte-2); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 44px; background: transparent; margin: 8px 0 0; }
+  input[type=range]::-webkit-slider-runnable-track { height: 14px; border-radius: 7px;
+      background: linear-gradient(to right, var(--akzent) var(--anteil, 50%), var(--flaeche-2) var(--anteil, 50%)); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 34px; height: 34px; margin-top: -10px;
+      border-radius: 50%; background: var(--flaeche); border: 3px solid var(--akzent); }
+  input[type=range]::-moz-range-track { height: 14px; border-radius: 7px; background: var(--flaeche-2); }
+  input[type=range]::-moz-range-progress { height: 14px; border-radius: 7px; background: var(--akzent); }
+  input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%; background: var(--flaeche); border: 3px solid var(--akzent); }
+
+  /* Helligkeit: kleiner als die Lautstärke, ein Regler zwischen zwei Sonnen.
+     Fehlt, wenn der Bildschirm am Notebook sie nicht hergibt. */
+  .hell { display: grid; grid-template-columns: 28px 1fr 36px; gap: 10px; align-items: center; }
+  .hell svg { stroke: var(--tinte-2); fill: none; stroke-width: 2; stroke-linecap: round; }
+  .hell input[type=range] { margin: 0; }
+  .hell .titel { grid-column: 1 / -1; font-size: 13px; color: var(--tinte-2); display: flex; justify-content: space-between; }
+
+  .modal { position: fixed; inset: 0; z-index: 10; display: flex; align-items: flex-end; justify-content: center; }
+  .modal .grundflaeche { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+  .modal .blatt { position: relative; width: 100%; max-width: 520px; background: var(--flaeche);
+                  border-radius: 20px 20px 0 0; padding: 22px 20px max(22px, env(safe-area-inset-bottom));
+                  border-top: 1px solid var(--linie-stark); }
+  .modal h1 { font-size: 20px; margin: 0 0 18px; }
+  .modal .hell .titel { justify-content: center; font-size: 34px; color: var(--tinte); margin-bottom: 6px; }
+  .modal .fertig { display: block; width: 100%; height: 56px; margin-top: 22px; border: none; border-radius: 14px;
+                   background: var(--akzent); color: var(--akzent-tinte); font-size: 18px; font-weight: 600; }
+
+  .leiste { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .leiste button { height: 56px; border-radius: 14px; border: 1px solid var(--linie-stark);
+                   background: var(--flaeche-2); font-size: 17px; font-weight: 600; }
+  .leiste button.an { background: var(--akzent-weich); border-color: var(--akzent); }
+  .leiste button.stopp { background: var(--tinte); border-color: var(--tinte); color: var(--grund); }
+
+  /* Sender: zwei Spalten, groß genug für den Daumen. */
+  h2 { font-size: 13px; letter-spacing: .08em; color: var(--tinte-3); margin: 8px 2px 0; }
+  .sender { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sender button { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 10px 12px;
+                   text-align: left; border-radius: var(--radius); border: 1px solid var(--linie);
+                   background: var(--flaeche); }
+  .sender button.aktiv { border: 2px solid var(--akzent); background: var(--akzent-weich); }
+  .sender .bild { width: 44px; height: 44px; font-size: 15px; border-radius: 10px; flex: none; }
+  .sender .name { font-size: 15px; font-weight: 600; line-height: 1.2;
+                  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .sender .nr { font-size: 12px; color: var(--tinte-3); }
+
+  /* Anmeldung */
+  .anmeldung { text-align: center; padding: 28px 20px; }
+  .anmeldung h1 { font-size: 24px; margin: 0 0 6px; }
+  .anmeldung p { color: var(--tinte-2); margin: 0 0 20px; }
+  .anmeldung input { width: 100%; max-width: 240px; height: 72px; text-align: center; font-size: 40px;
+                     letter-spacing: .4em; padding-left: .4em; border-radius: 16px; border: 2px solid var(--linie-stark);
+                     background: var(--flaeche); color: var(--tinte); font-variant-numeric: tabular-nums; }
+  .anmeldung input:focus { outline: none; border-color: var(--akzent); }
+  .anmeldung button { display: block; width: 100%; max-width: 240px; margin: 16px auto 0; height: 56px;
+                      border-radius: 14px; border: none; background: var(--akzent); color: var(--akzent-tinte);
+                      font-size: 18px; font-weight: 600; }
+  .meldung { color: var(--fehler); min-height: 1.4em; margin-top: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="kopf">
+    <b>REGOradio</b>
+    <div class="rechts">
+      <span class="punkt" id="verbindung"><i></i><span id="verbindungText">verbunden</span></span>
+      <!-- Hinter dem Zahnrad: die Helligkeit. Selten gebraucht, soll beim
+           Griff zur Lautstärke nicht im Weg sein. -->
+      <button class="zahnrad" id="zahnrad" aria-label="Mehr Einstellungen" aria-expanded="false" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Anmeldung: nur beim ersten Mal. Danach merkt sich das Handy die
+       Anmeldung, bis am Notebook eine neue PIN vergeben wird. -->
+  <section class="karte anmeldung" id="anmeldung" hidden>
+    <h1>PIN eingeben</h1>
+    <p>Sie steht am Notebook unter Einstellungen, Handy.</p>
+    <form id="pinForm">
+      <input id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code"
+             aria-label="PIN" required>
+      <button type="submit">Verbinden</button>
+    </form>
+    <div class="meldung" id="pinMeldung"></div>
+  </section>
+
+  <div id="radio" hidden>
+    <h2 style="margin-top: 0">AM NOTEBOOK</h2>
+    <div class="ansicht" id="ansicht" style="margin: 8px 0 14px">
+      <button data-ansicht="bedienung">Bedienung</button>
+      <button data-ansicht="cover">Cover</button>
+      <button data-ansicht="uhr">Uhr</button>
+    </div>
+
+    <section class="karte jetzt" aria-live="polite">
+      <div class="bild" id="jetztBild"></div>
+      <div>
+        <div class="klein" id="jetztKlein">NICHTS LÄUFT</div>
+        <div class="titel" id="jetztTitel">Sender antippen</div>
+        <div class="zweit" id="jetztZweit"></div>
+      </div>
+    </section>
+
+    <section class="karte" style="margin-top: 14px">
+      <div class="laut">
+        <button class="rund" id="leiser" aria-label="Leiser">−</button>
+        <div class="wert"><b id="wert">–</b><span id="wertText">Lautstärke</span></div>
+        <button class="rund" id="lauter" aria-label="Lauter">+</button>
+      </div>
+      <input type="range" id="regler" min="0" max="100" value="50" aria-label="Lautstärke">
+    </section>
+
+
+    <div class="leiste" style="margin-top: 14px">
+      <button id="stumm">Stumm</button>
+      <button id="stopp" class="stopp">Stopp</button>
+    </div>
+
+    <h2 style="margin-top: 20px">SENDER</h2>
+    <div class="sender" id="sender" style="margin-top: 10px"></div>
+  </div>
+</main>
+
+<!-- Helligkeit als Blatt über der Seite: selten gebraucht, deshalb hinter
+     dem Zahnrad. Ein Tipp auf den dunklen Grund oder „Fertig“ schließt es. -->
+<div class="modal" id="hellModal" hidden>
+  <div class="grundflaeche" id="hellGrund"></div>
+  <section class="blatt" role="dialog" aria-modal="true" aria-labelledby="hellTitel">
+    <h1 id="hellTitel">Helligkeit am Notebook</h1>
+    <div class="hell">
+      <div class="titel"><b id="hellWert">–</b></div>
+      <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="3.5"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>
+      <input type="range" id="hellRegler" min="5" max="100" value="50" aria-label="Helligkeit">
+      <svg viewBox="0 0 24 24" width="32" height="32"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+    </div>
+    <button class="fertig" id="hellZu">Fertig</button>
+  </section>
+</div>
+
+<script>
+"use strict";
+
+// Kürzel und Farbe wie am Notebook (Katalog/Monogramm.cs) -- dieselbe
+// Rechnung, damit ein Sender ohne Logo hier und dort gleich aussieht.
+const FARBEN = ["#2F5D8A", "#3C6E47", "#6B4E2E", "#7A3B52", "#4E4A7A", "#8A5A1F", "#2E6770", "#6E3A3A", "#45556B", "#5E5530"];
+function farbe(name) {
+  let summe = 0;
+  for (const z of name.trim().toUpperCase()) summe = (Math.imul(summe, 31) + z.codePointAt(0)) | 0;
+  return FARBEN[(summe >>> 0) % FARBEN.length];
+}
+function kuerzel(name) {
+  const woerter = name.split(/[\s\-_|/.]+/).filter(w => w && /[\p{L}\p{N}]/u.test(w[0]));
+  if (!woerter.length) return "?";
+  if (woerter.length === 1) {
+    const w = woerter[0], ziffer = [...w].find(z => /\d/.test(z));
+    if (ziffer && /\p{L}/u.test(w[0])) return w[0].toUpperCase() + ziffer;
+    return w.slice(0, 2).toUpperCase();
+  }
+  const letztes = woerter[woerter.length - 1];
+  if (/^\d+$/.test(letztes)) return woerter[0][0].toUpperCase() + letztes;
+  return woerter.slice(0, 2).map(w => w[0].toUpperCase()).join("");
+}
+
+const $ = id => document.getElementById(id);
+let stand = null;
+let senderListe = [];
+let schiebtGerade = false;
+let hellSchiebt = false, hellUhr = null;
+
+async function api(pfad, methode = "GET", koerper) {
+  const antwort = await fetch(pfad, {
+    method: methode,
+    credentials: "same-origin",
+    headers: koerper ? { "Content-Type": "application/json" } : {},
+    body: koerper ? JSON.stringify(koerper) : undefined,
+  });
+  if (antwort.status === 401 && pfad !== "/api/anmelden") { anmeldenZeigen(); throw new Error("abgemeldet"); }
+  return antwort;
+}
+
+function verbunden(ja) {
+  $("verbindung").classList.toggle("weg", !ja);
+  $("verbindungText").textContent = ja ? "verbunden" : "keine Verbindung";
+}
+
+function anmeldenZeigen() {
+  $("radio").hidden = true;
+  $("zahnrad").hidden = true;
+  hellSchliessen();
+  $("anmeldung").hidden = false;
+  $("pin").focus();
+}
+
+function bildSetzen(element, adresse, name, istLogo) {
+  element.className = "bild" + (istLogo ? " logo" : "");
+  element.textContent = "";
+  element.style.background = "";
+  const ersatz = () => {
+    element.className = "bild";
+    element.textContent = name ? kuerzel(name) : "";
+    element.style.background = name ? farbe(name) : "";
+  };
+  if (!adresse) { ersatz(); return; }
+  const img = new Image();
+  img.alt = "";
+  img.onerror = ersatz;   // tote Logos gibt es im Verzeichnis reichlich
+  img.src = adresse;
+  element.appendChild(img);
+}
+
+function standZeigen(s) {
+  stand = s;
+  const bild = $("jetztBild");
+  if (!s.laeuft && !s.sender) {
+    $("jetztKlein").textContent = "NICHTS LÄUFT";
+    $("jetztTitel").textContent = "Sender antippen";
+    $("jetztZweit").textContent = "";
+    bildSetzen(bild, "", "", false);
+  } else {
+    $("jetztKlein").textContent = (s.laeuft ? "LÄUFT" : "WIRD VERBUNDEN") + " · " + s.sender.toUpperCase();
+    $("jetztTitel").textContent = s.titel || s.sender;
+    $("jetztZweit").textContent = s.interpret;
+    // Cover, wenn es eins gibt, sonst das Senderlogo.
+    if (s.cover) bildSetzen(bild, s.cover, s.sender, false);
+    else bildSetzen(bild, s.logo, s.sender, true);
+  }
+  if (!schiebtGerade) {
+    $("regler").value = s.lautstaerke;
+    reglerFarbe();
+  }
+  // Was das Notebook zeigt. Cover nur, wenn ein Sender gewählt ist.
+  document.querySelectorAll("#ansicht button").forEach(b => {
+    b.classList.toggle("an", b.dataset.ansicht === s.ansicht);
+    if (b.dataset.ansicht === "cover") b.disabled = !s.sender;
+  });
+  // Helligkeit: null heißt, der Bildschirm am Notebook gibt sie nicht her.
+  // Dann gibt es auch kein Zahnrad -- hinter ihm liegt sonst nichts.
+  $("zahnrad").hidden = s.helligkeit == null;
+  if (s.helligkeit == null) hellSchliessen();
+  if (s.helligkeit != null && !hellSchiebt) {
+    $("hellRegler").value = s.helligkeit;
+    $("hellWert").textContent = s.helligkeit + " %";
+    hellFarbe();
+  }
+  $("wert").textContent = s.lautstaerke;
+  $("wert").style.opacity = s.stumm ? 0.35 : 1;
+  $("wertText").textContent = s.stumm ? "Stumm" : "Lautstärke";
+  $("stumm").textContent = s.stumm ? "Ton an" : "Stumm";
+  $("stumm").classList.toggle("an", s.stumm);
+  document.querySelectorAll(".sender button").forEach(b =>
+    b.classList.toggle("aktiv", s.laeuft && Number(b.dataset.platz) === s.platz));
+}
+
+function senderZeigen(liste) {
+  senderListe = liste;
+  const ziel = $("sender");
+  ziel.textContent = "";
+  for (const s of liste) {
+    const knopf = document.createElement("button");
+    knopf.dataset.platz = s.platz;
+    const bild = document.createElement("div");
+    bildSetzen(bild, s.logo, s.name, true);
+    const text = document.createElement("div");
+    const nr = document.createElement("div");
+    nr.className = "nr";
+    nr.textContent = "Taste " + s.platz;
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = s.name;
+    text.append(nr, name);
+    knopf.append(bild, text);
+    knopf.addEventListener("click", async () => {
+      standZeigen(await (await api("/api/spielen/" + s.platz, "POST")).json());
+    });
+    ziel.appendChild(knopf);
+  }
+  if (stand) standZeigen(stand);
+}
+
+function reglerFarbe() {
+  $("regler").style.setProperty("--anteil", $("regler").value + "%");
+}
+
+// Lautstärke: beim Schieben nur alle 150 ms senden. Sonst ginge bei jedem
+// Pixel eine Anfrage raus, und die Antworten kämen durcheinander zurück.
+let sendeUhr = null;
+function lautstaerkeSenden(wert) {
+  wert = Math.max(0, Math.min(100, wert));
+  $("wert").textContent = wert;
+  clearTimeout(sendeUhr);
+  sendeUhr = setTimeout(async () => {
+    try { standZeigen(await (await api("/api/lautstaerke/" + wert, "POST")).json()); } catch (e) {}
+  }, 150);
+}
+
+$("regler").addEventListener("input", () => {
+  schiebtGerade = true;
+  reglerFarbe();
+  lautstaerkeSenden(Number($("regler").value));
+});
+$("regler").addEventListener("change", () => { schiebtGerade = false; });
+$("leiser").addEventListener("click", () => {
+  const w = Number($("regler").value) - 1;
+  $("regler").value = w; reglerFarbe(); lautstaerkeSenden(w);
+});
+$("lauter").addEventListener("click", () => {
+  const w = Number($("regler").value) + 1;
+  $("regler").value = w; reglerFarbe(); lautstaerkeSenden(w);
+});
+// Helligkeit: dieselbe Bremse wie bei der Lautstärke.
+function hellFarbe() {
+  const r = $("hellRegler");
+  r.style.setProperty("--anteil", ((r.value - r.min) / (r.max - r.min) * 100) + "%");
+}
+$("hellRegler").addEventListener("input", () => {
+  hellSchiebt = true;
+  hellFarbe();
+  const wert = Number($("hellRegler").value);
+  $("hellWert").textContent = wert + " %";
+  clearTimeout(hellUhr);
+  hellUhr = setTimeout(async () => {
+    try { standZeigen(await (await api("/api/helligkeit/" + wert, "POST")).json()); } catch (e) {}
+  }, 150);
+});
+$("hellRegler").addEventListener("change", () => { hellSchiebt = false; });
+
+function hellSchliessen() {
+  $("hellModal").hidden = true;
+  $("zahnrad").setAttribute("aria-expanded", "false");
+}
+$("zahnrad").addEventListener("click", () => {
+  $("hellModal").hidden = false;
+  $("zahnrad").setAttribute("aria-expanded", "true");
+});
+$("hellZu").addEventListener("click", hellSchliessen);
+$("hellGrund").addEventListener("click", hellSchliessen);
+
+document.querySelectorAll("#ansicht button").forEach(b => b.addEventListener("click", async () => {
+  const antwort = await api("/api/ansicht/" + b.dataset.ansicht, "POST");
+  if (antwort.ok) standZeigen(await antwort.json());
+}));
+
+$("stumm").addEventListener("click", async () => {
+  standZeigen(await (await api("/api/stumm/" + !(stand && stand.stumm), "POST")).json());
+});
+$("stopp").addEventListener("click", async () => {
+  standZeigen(await (await api("/api/stopp", "POST")).json());
+});
+
+$("pinForm").addEventListener("submit", async ereignis => {
+  ereignis.preventDefault();
+  const antwort = await api("/api/anmelden", "POST", { pin: $("pin").value });
+  if (antwort.ok) {
+    $("pin").value = "";
+    $("pinMeldung").textContent = "";
+    await starten();
+  } else {
+    const inhalt = await antwort.json().catch(() => ({}));
+    $("pinMeldung").textContent = inhalt.meldung || "Das ging nicht.";
+    $("pin").select();
+  }
+});
+
+async function standHolen() {
+  try {
+    standZeigen(await (await api("/api/stand")).json());
+    verbunden(true);
+  } catch (e) {
+    if (e.message !== "abgemeldet") verbunden(false);
+  }
+}
+
+async function starten() {
+  try {
+    const antwort = await api("/api/sender");
+    senderZeigen(await antwort.json());
+    $("anmeldung").hidden = true;
+    $("radio").hidden = false;
+    verbunden(true);
+    await standHolen();
+  } catch (e) {
+    if (e.message !== "abgemeldet") verbunden(false);
+  }
+}
+
+// Alle zwei Sekunden nachsehen -- nur, solange die Seite zu sehen ist. Ein
+// Handy in der Tasche soll nicht im Takt das WLAN beschäftigen.
+setInterval(() => { if (document.visibilityState === "visible" && !$("radio").hidden) standHolen(); }, 2000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") starten(); });
+starten();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+
+Es ist 1 Schnittstelle auf dem System vorhanden:
+
+    Name                   : WLAN
+    Beschreibung            : Intel(R) Wi-Fi 6 AX201 160MHz
+    GUID                   : 00000000-0000-0000-0000-000000000000
+    Physische Adresse       : 00:00:00:00:00:01
+    Benutzeroberflächentyp         : Primär
+    Status                  : Verbunden
+    SSID                   : Hotel-Gäste
+    AP BSSID               : 00:00:00:00:00:02
+    Bereich                   : 5 GHz
+    Kanal                : 36
+    VerbundeneS Akm-Verschlüsselungsverfahren : [ akm = 00-0f-ac:08, Chiffre = 00-0f-ac:04 ]
+    Netzwerktyp            : Infrastruktur
+    Funktyp                   : 802.11ax
+    Authentifizierung   : WPA3-Personal  (H2E)
+    Verschlüsselungsverfahren                 : CCMP
+    Verbindungsmodus        : Automat. Verbindung
+    Empfangsrate (MBit/s)  : 1153
+    Übertragungsrate (MBit/s) : 1441
+    Signal              : 92%
+    RSSI                   : -59
+    Profil                 : Hotel-Gäste
+    QoS MSCS konfiguriert         : 0
+    QoS-Zuordnung konfiguriert         : 0
+    Durch Richtlinie zugelassene QoS-Zuordnung   :  0

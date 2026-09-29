@@ -1,0 +1,568 @@
+<Window x:Class="REGOradio.Hauptfenster"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="REGOradio" Height="720" Width="1280"
+        MinHeight="400" MinWidth="700"
+        Icon="symbol.ico"
+        FontFamily="Segoe UI Variable Display, Segoe UI"
+        Background="{DynamicResource Grund}"
+        Foreground="{DynamicResource Tinte}"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
+  <!--
+    Maximiert: Auf einem Notebook mit 150 % Skalierung bleiben von 1920×1080
+    rund 1280×720 Punkte. Dafür ist dieser Aufbau gemacht; ein Fenster in
+    fester Größe wäre dort abgeschnitten.
+
+    Zwei Ebenen übereinander:
+
+      Hauptschirm     Kopfzeile, zwölf Stationstasten, rechts das Feld „Läuft"
+      Einstellungen   ein Seitenblatt von rechts über einem abgedunkelten Grund
+
+    Die Einstellungen sind Teil dieses Fensters, kein eigenes. Ein zweites
+    Fenster mit Titelleiste und Schließkreuz ist am Touchscreen eine kleine
+    Zielscheibe; ein Blatt, das man mit „Fertig" oder einem Tipp daneben
+    wegschickt, ist keine.
+
+    Entwurf: das Mockup „REGOradio – Oberfläche".
+  -->
+  <Window.Resources>
+    <!-- Die Symbole als Strichzeichnungen im 24er-Raster. Sie übernehmen die
+         Schriftfarbe der Taste, in der sie stehen – nur so wird das Symbol im
+         gewählten Segment mit weiß, ohne dass jemand eine zweite Fassung
+         pflegt. -->
+    <Style x:Key="Symbol" TargetType="Path">
+      <Setter Property="Width" Value="24" />
+      <Setter Property="Height" Value="24" />
+      <Setter Property="Stretch" Value="None" />
+      <Setter Property="StrokeThickness" Value="2" />
+      <Setter Property="StrokeStartLineCap" Value="Round" />
+      <Setter Property="StrokeEndLineCap" Value="Round" />
+      <Setter Property="StrokeLineJoin" Value="Round" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Control}}" />
+    </Style>
+    <Geometry x:Key="IconWlan">M2,9 A15,15 0 0 1 22,9 M5,12.5 A10,10 0 0 1 19,12.5 M8.5,16 A5,5 0 0 1 15.5,16 M11,19.5 A1,1 0 1 1 13,19.5 A1,1 0 1 1 11,19.5</Geometry>
+    <Geometry x:Key="IconBluetooth">M7,7 L17,17 L12,22 L12,2 L17,7 L7,17</Geometry>
+    <Geometry x:Key="IconNotebook">M5.5,5 H18.5 A1.5,1.5 0 0 1 20,6.5 V13.5 A1.5,1.5 0 0 1 18.5,15 H5.5 A1.5,1.5 0 0 1 4,13.5 V6.5 A1.5,1.5 0 0 1 5.5,5 Z M2,19 H22</Geometry>
+    <Geometry x:Key="IconSuche">M4,11 A7,7 0 1 1 18,11 A7,7 0 1 1 4,11 M20,20 L16.5,16.5</Geometry>
+    <Geometry x:Key="IconRegler">M4,6 H14 M18,6 H20 M4,12 H8 M12,12 H20 M4,18 H16 M14,6 A2,2 0 1 1 18,6 A2,2 0 1 1 14,6 M8,12 A2,2 0 1 1 12,12 A2,2 0 1 1 8,12 M16,18 A2,2 0 1 1 20,18 A2,2 0 1 1 16,18</Geometry>
+    <Geometry x:Key="IconPfeil">M9,6 L15,12 L9,18</Geometry>
+    <Geometry x:Key="IconPlus">M12,5 V19 M5,12 H19</Geometry>
+    <Geometry x:Key="IconMinus">M5,12 H19</Geometry>
+    <Geometry x:Key="IconStumm">M11,5 L6,9 H3 V15 H6 L11,19 Z M16,9 L21,15 M21,9 L16,15</Geometry>
+    <Geometry x:Key="IconLautsprecher">M11,5 L6,9 H3 V15 H6 L11,19 Z M15.5,8.5 A5,5 0 0 1 15.5,15.5 M18.5,5.5 A9,9 0 0 1 18.5,18.5</Geometry>
+    <Geometry x:Key="IconBildschirm">M5,4 H19 A2,2 0 0 1 21,6 V14 A2,2 0 0 1 19,16 H5 A2,2 0 0 1 3,14 V6 A2,2 0 0 1 5,4 Z M8,20 H16 M12,16 V20</Geometry>
+    <Geometry x:Key="IconSonne">M8,12 A4,4 0 1 1 16,12 A4,4 0 1 1 8,12 M12,2 V4 M12,20 V22 M4.9,4.9 L6.3,6.3 M17.7,17.7 L19.1,19.1 M2,12 H4 M20,12 H22 M4.9,19.1 L6.3,17.7 M17.7,6.3 L19.1,4.9</Geometry>
+    <Geometry x:Key="IconMond">M20,14.5 A8,8 0 1 1 9.5,4 A6.5,6.5 0 0 0 20,14.5 Z</Geometry>
+    <!-- Ein Knopf ohne Rahmen und Fläche, für Dinge, die antippbar sind,
+         aber nicht wie eine Taste aussehen sollen: die Uhrzeit. -->
+    <Style x:Key="Flachtaste" TargetType="Button">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Rahmen" Background="Transparent" CornerRadius="12" Padding="10,4">
+              <ContentPresenter VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource AkzentWeich}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Geometry x:Key="IconUhr">M3,12 A9,9 0 1 1 21,12 A9,9 0 1 1 3,12 M12,7 V12 L15,14</Geometry>
+  </Window.Resources>
+
+  <Grid>
+
+    <!-- FESTE FLÄCHE, SKALIERT. Hauptschirm und Einstellungen sind für
+         1280×720 Punkte gebaut und werden als Ganzes vergrößert oder
+         verkleinert. Vorher bekam jedes Feld seinen Anteil am Fenster – beim
+         Ziehen am Fensterrand wurde das Feld „Läuft" gestaucht, bis Balken und
+         Knöpfe übereinanderlagen. Jetzt verzieht sich nichts; auf einem
+         16:9-Schirm füllt die Fläche das Fenster genau. -->
+    <Viewbox Stretch="Uniform">
+    <Grid Width="1280" Height="720">
+
+    <!-- ========================================================= Hauptschirm -->
+    <Grid Margin="24,20">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <!-- Kopfzeile: links drei Symbole, rechts die Uhr. Nichts sonst –
+           WLAN-Name, Ausgang und Einstellungen liegen je einen Tipp dahinter,
+           und die Fläche gehört den Sendern. -->
+      <Grid Grid.Row="0" Margin="0,0,0,16">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!-- WLAN: führt in die WLAN-Liste von Windows. Im Hotel ist „hängt
+             der Rechner im richtigen Netz" die erste Frage; ohne Verbindung
+             wird das Symbol rot, der Name steht im Hinweis. -->
+        <Button x:Name="WlanKnopf" Grid.Column="0" Style="{StaticResource Symboltaste}"
+                Click="WlanOeffnen" AutomationProperties.Name="WLAN">
+          <Path x:Name="WlanSymbol" Style="{StaticResource Symbol}" Data="{StaticResource IconWlan}" />
+        </Button>
+
+        <!-- Ton: öffnet das Blatt „Ton geht an". Das Symbol zeigt, wohin er
+             gerade geht – Lautsprecher oder Bluetooth-Box. -->
+        <Button x:Name="TonKnopf" Grid.Column="1" Style="{StaticResource Symboltaste}" Margin="12,0,0,0"
+                Click="TonOeffnen" AutomationProperties.Name="Ton">
+          <Path x:Name="TonSymbol" Style="{StaticResource Symbol}" Data="{StaticResource IconLautsprecher}" />
+        </Button>
+
+        <Button Grid.Column="2" Style="{StaticResource Symboltaste}" Margin="12,0,0,0"
+                Click="EinstellungenOeffnen" AutomationProperties.Name="Einstellungen"
+                ToolTip="Einstellungen">
+          <Path Style="{StaticResource Symbol}" Data="{StaticResource IconRegler}" />
+        </Button>
+
+        <!-- Die Uhrzeit ganz rechts, und sie ist ein Knopf: Antippen zeigt die
+             Wortuhr im Vollbild. Der negative Rand gleicht den Innenabstand
+             der flachen Taste aus, damit die Ziffern bündig mit dem Feld
+             „Läuft" darunter enden. -->
+        <Button Grid.Column="4" Style="{StaticResource Flachtaste}" Margin="0,0,-10,0"
+                Click="WortuhrOeffnen" ToolTip="Wortuhr im Vollbild"
+                AutomationProperties.Name="Wortuhr">
+          <!-- 44 Punkt: Die Kopfzeile trägt links nur drei Symbole, rechts ist
+               Platz – und die Uhr liest man vom Bett aus. -->
+          <TextBlock x:Name="Uhrzeit" FontSize="44" FontWeight="SemiBold" LineHeight="48"
+                     LineStackingStrategy="BlockLineHeight" />
+        </Button>
+      </Grid>
+
+      <!-- Rumpf: Tasten links, „Läuft" rechts -->
+      <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="380" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Neun Felder: acht Sender und „Mehr". Ein Raster von drei mal drei
+             lässt jeder Taste genug Fläche für Logo und Namen – bei zwölf
+             wurden die Namen zu „Rock Antenn…". Alles Weitere, auch Suchen
+             und Umordnen, liegt hinter „Mehr". Der negative Rand gleicht den
+             Rand der Tasten aus, damit die Kanten bündig stehen. -->
+        <UniformGrid x:Name="Tastenfeld" Grid.Column="0" Rows="3" Columns="3" Margin="-7,-7,13,-7" />
+
+        <Border Grid.Column="1" Background="{DynamicResource Flaeche}"
+                BorderBrush="{DynamicResource Linie}" BorderThickness="1"
+                CornerRadius="22" Padding="22">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Der Sender: klein. Er ist die Antwort auf „welche Taste", das
+                 Lied ist die auf „was höre ich" – und das ist die Frage, die
+                 man am Radio stellt. -->
+            <Grid Grid.Row="0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Border x:Name="LaufendesBild" Width="44" Height="44" CornerRadius="10"
+                      Background="{DynamicResource Flaeche2}">
+                <Grid>
+                  <TextBlock x:Name="LaufendesKuerzel" FontSize="16" FontWeight="Bold" Foreground="White"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  <Image x:Name="LaufendesLogo" Stretch="Uniform" Margin="4" />
+                </Grid>
+              </Border>
+              <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                <TextBlock x:Name="LaeuftZeile" FontSize="12" FontWeight="Bold"
+                           Foreground="{DynamicResource Akzent}" Text="NICHTS LÄUFT" />
+                <TextBlock x:Name="SenderZeile" FontSize="20" FontWeight="Bold"
+                           TextTrimming="CharacterEllipsis" Text="Taste antippen" />
+                <TextBlock x:Name="MetaZeile" FontSize="13"
+                           Foreground="{DynamicResource Tinte2}" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="FehlerZeile" Grid.Row="1" FontSize="15" Margin="0,10,0,0"
+                       Foreground="{DynamicResource Warnung}" TextWrapping="Wrap" Visibility="Collapsed" />
+
+            <!-- Das Lied: Cover, Titel, Interpret. Die ganze Fläche ist ein
+                 Knopf – ein Tipp zeigt das Lied im Vollbild. -->
+            <Button x:Name="TitelKnopf" Grid.Row="2" Style="{StaticResource Flachtaste}" Margin="-10,12,-10,0"
+                    Click="JetztOeffnen" AutomationProperties.Name="Jetzt läuft im Vollbild">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <!-- Das Bild kommt als ImageBrush in den Hintergrund des
+                     Rahmens: Nur so folgt es der Rundung. Ein Image darin
+                     würde eckig über die Ecken stehen. -->
+                <Border x:Name="CoverRahmen" Width="112" Height="112" CornerRadius="14"
+                        Background="{DynamicResource Flaeche2}">
+                  <TextBlock x:Name="CoverKuerzel" FontSize="34" FontWeight="Bold" Foreground="White"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                  <TextBlock x:Name="TitelZeile" FontSize="20" FontWeight="Bold" TextWrapping="Wrap"
+                             MaxHeight="54" TextTrimming="CharacterEllipsis"
+                             LineHeight="26" LineStackingStrategy="BlockLineHeight" />
+                  <TextBlock x:Name="InterpretZeile" FontSize="17" Margin="0,4,0,0" TextWrapping="Wrap"
+                             MaxHeight="46" TextTrimming="CharacterEllipsis"
+                             Foreground="{DynamicResource Tinte2}" />
+                </StackPanel>
+              </Grid>
+            </Button>
+
+            <!-- Lautstärke: der Balken so hoch wie das Feld, daneben große
+                 Flächen für lauter und leiser, dazwischen die Zahl. Vorher war
+                 das ein dünner Schieber am unteren Rand – „verkümmert", zu
+                 Recht. -->
+            <Grid Grid.Row="3" Margin="0,16">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Slider x:Name="LautstaerkeBalken" Grid.Column="0" Style="{StaticResource Lautstaerkebalken}"
+                      ValueChanged="LautstaerkeGeschoben" SmallChange="1" LargeChange="5"
+                      AutomationProperties.Name="Lautstärke" />
+              <Grid Grid.Column="1" Margin="18,0,0,0">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <RepeatButton Grid.Row="0" Style="{StaticResource Grosswiederholtaste}" MinHeight="84" Click="Lauter"
+                              AutomationProperties.Name="Lauter">
+                  <Viewbox Width="40" Height="40">
+                    <Path Style="{StaticResource Symbol}" Data="{StaticResource IconPlus}" StrokeThickness="2.4" />
+                  </Viewbox>
+                </RepeatButton>
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                  <TextBlock x:Name="LautstaerkeZahl" FontSize="64" FontWeight="Bold"
+                             HorizontalAlignment="Center" LineHeight="64"
+                             LineStackingStrategy="BlockLineHeight" />
+                  <TextBlock x:Name="LautstaerkeText" FontSize="16" HorizontalAlignment="Center"
+                             Foreground="{DynamicResource Tinte2}" Text="Lautstärke" Margin="0,4,0,0" />
+                </StackPanel>
+                <RepeatButton Grid.Row="2" Style="{StaticResource Grosswiederholtaste}" MinHeight="84" Click="Leiser"
+                              AutomationProperties.Name="Leiser">
+                  <Viewbox Width="40" Height="40">
+                    <Path Style="{StaticResource Symbol}" Data="{StaticResource IconMinus}" StrokeThickness="2.4" />
+                  </Viewbox>
+                </RepeatButton>
+              </Grid>
+            </Grid>
+
+            <UniformGrid Grid.Row="4" Columns="2">
+              <Button x:Name="StummKnopf" Style="{StaticResource Leistentaste}" Margin="0,0,6,0" Click="StummUmschalten">
+                <StackPanel Orientation="Horizontal">
+                  <Path Style="{StaticResource Symbol}" Data="{StaticResource IconStumm}" />
+                  <TextBlock x:Name="StummText" Text="Stumm" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Style="{StaticResource Stopptaste}" Margin="6,0,0,0" Click="Stoppen">
+                <StackPanel Orientation="Horizontal">
+                  <Rectangle Width="12" Height="12" RadiusX="2" RadiusY="2" VerticalAlignment="Center"
+                             Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                  <TextBlock Text="Stopp" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </UniformGrid>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+
+    <!-- ========================================================= Alle Sender -->
+    <!-- Hinter „Mehr": alle Plätze, zum Umordnen per Ziehen, zum Suchen und
+         Belegen. Ziehen gibt es nur hier, nicht auf dem Hauptschirm: Dort soll
+         ein Tipp am Touchscreen einen Sender spielen und nie versehentlich die
+         Reihenfolge ändern. -->
+    <Grid x:Name="Senderebene" Visibility="Collapsed">
+      <Border Background="#800E0F10" MouseLeftButtonUp="SenderSchliessen" />
+      <Border Width="1200" Height="660" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1"
+              CornerRadius="24" Padding="28,22">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="Alle Sender" FontSize="30" FontWeight="Bold" />
+              <TextBlock FontSize="15" Margin="0,4,0,0" Foreground="{DynamicResource Tinte2}" TextWrapping="Wrap"
+                         Text="Ziehen ordnet um. Die ersten acht liegen auf dem Hauptschirm. Langes Drücken nimmt einen Sender herunter." />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button Style="{StaticResource Haupttaste}" Click="SucheOeffnen" Margin="0,0,12,0">
+                <StackPanel Orientation="Horizontal">
+                  <Path Style="{StaticResource Symbol}" Data="{StaticResource IconSuche}" StrokeThickness="2.2" />
+                  <TextBlock Text="Sender suchen" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Style="{StaticResource Taste}" Content="Fertig" MinWidth="130" Click="SenderSchliessen" />
+            </StackPanel>
+          </Grid>
+          <UniformGrid x:Name="Senderfeld" Grid.Row="1" Rows="4" Columns="6" Margin="-6,14,-6,-6" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- ======================================================= Einstellungen -->
+    <Grid x:Name="Einstellungsebene" Visibility="Collapsed">
+      <!-- Ein Tipp auf den dunklen Grund schließt das Blatt – so, wie man es
+           von jedem Blatt am Telefon kennt. -->
+      <Border Background="#800E0F10" MouseLeftButtonUp="EinstellungenSchliessen" />
+
+      <Border HorizontalAlignment="Right" Width="880" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1,0,0,0" Padding="30,26">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <Grid Grid.Row="0" Margin="0,0,0,22">
+            <TextBlock Text="Einstellungen" FontSize="32" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Style="{StaticResource Haupttaste}" Content="Fertig" HorizontalAlignment="Right"
+                    MinWidth="140" Click="EinstellungenSchliessen" />
+          </Grid>
+
+          <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="30" />
+              <ColumnDefinition Width="340" />
+            </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0">
+            <TextBlock Style="{StaticResource Abschnitt}" Text="DARSTELLUNG" />
+            <Border Style="{StaticResource Segmentrahmen}" Padding="5">
+              <UniformGrid Columns="3">
+                <RadioButton x:Name="DarstellungTag" Style="{StaticResource Segment}" GroupName="Darstellung"
+                             MinHeight="56" Padding="4,0" FontSize="15" Click="DarstellungGewaehlt" Tag="tag">
+                  <StackPanel>
+                    <Path Style="{StaticResource Symbol}" Data="{StaticResource IconSonne}" HorizontalAlignment="Center" />
+                    <TextBlock Text="Tag" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="DarstellungNacht" Style="{StaticResource Segment}" GroupName="Darstellung"
+                             MinHeight="56" Padding="4,0" FontSize="15" Click="DarstellungGewaehlt" Tag="nacht">
+                  <StackPanel>
+                    <Path Style="{StaticResource Symbol}" Data="{StaticResource IconMond}" HorizontalAlignment="Center" />
+                    <TextBlock Text="Nacht" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="DarstellungAuto" Style="{StaticResource Segment}" GroupName="Darstellung"
+                             MinHeight="56" Padding="4,0" FontSize="15" Click="DarstellungGewaehlt" Tag="automatisch"
+                             ToolTip="Von 21 bis 7 Uhr dunkel, sonst hell">
+                  <StackPanel>
+                    <Path Style="{StaticResource Symbol}" Data="{StaticResource IconUhr}" HorizontalAlignment="Center" />
+                    <TextBlock Text="Automatisch" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </RadioButton>
+              </UniformGrid>
+            </Border>
+
+            <!-- Helligkeit des Bildschirms. Nur sichtbar, wenn Windows sie
+                 hergibt – an einem angeschlossenen Monitor fehlt die Zeile. -->
+            <Grid x:Name="HelligkeitZeile" Margin="0,10,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="44" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="54" />
+              </Grid.ColumnDefinitions>
+              <Path Style="{StaticResource Symbol}" Data="{StaticResource IconSonne}" Opacity="0.6"
+                    HorizontalAlignment="Left" RenderTransformOrigin="0.5,0.5">
+                <Path.RenderTransform><ScaleTransform ScaleX="0.8" ScaleY="0.8" /></Path.RenderTransform>
+              </Path>
+              <Slider x:Name="HelligkeitRegler" Grid.Column="1" Style="{StaticResource Helligkeitsbalken}"
+                      ValueChanged="HelligkeitGeschoben" AutomationProperties.Name="Helligkeit" />
+              <Path Grid.Column="2" Style="{StaticResource Symbol}" Data="{StaticResource IconSonne}"
+                    HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5">
+                <Path.RenderTransform><ScaleTransform ScaleX="1.25" ScaleY="1.25" /></Path.RenderTransform>
+              </Path>
+            </Grid>
+
+            <TextBlock Style="{StaticResource Abschnitt}" Text="FARBTHEMA" Margin="0,16,0,10" />
+            <!-- Aufklappliste statt Segmente: Sechs Themen passen nicht mehr
+                 nebeneinander, und eine zweite Reihe schob das Blatt über den
+                 Rand. -->
+            <ComboBox x:Name="ThemaWahl" Style="{StaticResource Auswahl}" SelectionChanged="ThemaGewaehlt"
+                      AutomationProperties.Name="Farbthema">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <!-- Zwei Punkte: die Akzentfarbe bei Tag und bei Nacht. -->
+                    <Ellipse Width="16" Height="16" Fill="{Binding TagFarbe}" Stroke="#40000000" StrokeThickness="1" VerticalAlignment="Center" />
+                    <Ellipse Width="16" Height="16" Fill="{Binding NachtFarbe}" Stroke="#40000000" StrokeThickness="1" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Name}" Margin="14,0,0,0" VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Style="{StaticResource Abschnitt}" Text="VERHALTEN" Margin="0,16,0,10" />
+            <CheckBox x:Name="TrayBleibenSchalter" Style="{StaticResource Schalterzeile}" MinHeight="56" Margin="0,0,0,10"
+                      Click="VerhaltenGeaendert">
+              <TextBlock Text="Im Tray weiterspielen, wenn das Fenster zugeht" TextWrapping="Wrap" />
+            </CheckBox>
+            <CheckBox x:Name="RuhezustandSchalter" Style="{StaticResource Schalterzeile}" MinHeight="56" Margin="0,0,0,10"
+                      Click="VerhaltenGeaendert">
+              <TextBlock Text="Kein Ruhezustand, solange Radio läuft" TextWrapping="Wrap" />
+            </CheckBox>
+            <CheckBox x:Name="AutostartSchalter" Style="{StaticResource Schalterzeile}" MinHeight="56"
+                      Click="VerhaltenGeaendert">
+              <TextBlock Text="Mit Windows starten" TextWrapping="Wrap" />
+            </CheckBox>
+          </StackPanel>
+
+          <!-- Handy als Fernbedienung: Schalter, darunter QR-Code, Adresse und
+               PIN. Alles in einem Blick, weil man beim Einrichten mit dem
+               Handy in der Hand davorsteht. -->
+          <StackPanel Grid.Column="2">
+            <TextBlock Style="{StaticResource Abschnitt}" Text="HANDY" />
+            <CheckBox x:Name="FernSchalter" Style="{StaticResource Schalterzeile}" Click="FernUmschalten">
+              <TextBlock Text="Handy als Fernbedienung" TextWrapping="Wrap" />
+            </CheckBox>
+            <Border x:Name="FernTafel" Margin="0,12,0,0" Padding="16" CornerRadius="16"
+                    Background="{DynamicResource Flaeche}" BorderBrush="{DynamicResource Linie}" BorderThickness="1">
+              <StackPanel>
+                <!-- Weißer Grund um den Code, auch nachts: Handykameras lesen
+                     helle Codes auf dunklem Grund oft gar nicht. -->
+                <Border Background="White" CornerRadius="10" Padding="8" HorizontalAlignment="Center">
+                  <Image x:Name="FernQr" Width="176" Height="176" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                </Border>
+                <TextBlock x:Name="FernAdresse" FontSize="15" Margin="0,10,0,0" HorizontalAlignment="Center"
+                           Foreground="{DynamicResource Tinte2}" />
+                <Grid Margin="0,10,0,0">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="PIN" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource Tinte3}" />
+                    <TextBlock x:Name="FernPin" FontSize="40" FontWeight="Bold" />
+                  </StackPanel>
+                  <Button Style="{StaticResource Taste}" Content="Neue PIN" HorizontalAlignment="Right"
+                          Click="FernNeuePin" />
+                </Grid>
+              </StackPanel>
+            </Border>
+            <TextBlock x:Name="FernHinweis" FontSize="14" Margin="0,10,0,0" TextWrapping="Wrap"
+                       Foreground="{DynamicResource Tinte2}" />
+            <!-- Nur sichtbar, wenn die Firewall das Handy nicht durchlässt –
+                 etwa nach einem versehentlichen „Ablehnen". -->
+            <Button x:Name="FernFreigabe" Style="{StaticResource Haupttaste}" Margin="0,10,0,0"
+                    Content="Firewall-Freigabe einrichten" Visibility="Collapsed" Click="FernFreigabeEinrichten" />
+          </StackPanel>
+          </Grid>
+
+          <TextBlock x:Name="VersionZeile" Grid.Row="2" FontSize="14" Foreground="{DynamicResource Tinte3}" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- ============================================================= Ton -->
+    <!-- Wohin der Ton geht: ein eigenes Blatt hinter dem Ton-Symbol. Es ist
+         der Handgriff, der am häufigsten nach dem Senderwechsel kommt – die
+         Box ist da, die Box ist leer –, und er gehört nicht zwischen
+         Darstellung und Autostart. -->
+    <Grid x:Name="Tonebene" Visibility="Collapsed">
+      <Border Background="#800E0F10" MouseLeftButtonUp="TonSchliessen" />
+      <Border Width="640" VerticalAlignment="Center" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1"
+              CornerRadius="24" Padding="28,22">
+        <StackPanel>
+          <Grid Margin="0,0,0,18">
+            <TextBlock Text="Ton geht an" FontSize="30" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Style="{StaticResource Haupttaste}" Content="Fertig" HorizontalAlignment="Right"
+                    MinWidth="130" Click="TonSchliessen" />
+          </Grid>
+          <StackPanel x:Name="Geraeteliste" />
+          <Button Style="{StaticResource Taste}" MinHeight="68" Margin="0,4,0,0" Click="BluetoothKoppeln">
+            <StackPanel Orientation="Horizontal">
+              <Path Style="{StaticResource Symbol}" Data="{StaticResource IconBluetooth}" />
+              <TextBlock Text="Bluetooth-Box koppeln" Margin="10,0,0,0" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <TextBlock FontSize="15" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}"
+                     Text="Öffnet die Bluetooth-Einstellungen von Windows. Eine gekoppelte Box erscheint danach hier in der Liste." />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+
+    </Grid>
+    </Viewbox>
+
+    <!-- ========================================================= Jetzt läuft -->
+    <!-- Das Lied im Vollbild: das Cover groß, dasselbe Cover verschwommen als
+         Hintergrund. Liegt über dem
+         ganzen Fenster, nicht in der skalierten Fläche, damit der Hintergrund
+         wirklich bis an die Ränder reicht. -->
+    <Grid x:Name="Jetztebene" Visibility="Collapsed" Background="#0A0B0C" ClipToBounds="True"
+          MouseLeftButtonUp="JetztSchliessen">
+      <Image x:Name="JetztHintergrund" Stretch="UniformToFill" Opacity="0.45" Margin="-80">
+        <Image.Effect>
+          <BlurEffect Radius="90" KernelType="Gaussian" />
+        </Image.Effect>
+      </Image>
+      <!-- Abdunkeln, damit die Schrift auf jedem Cover lesbar bleibt, auch
+           auf einem weißen. -->
+      <Border Background="#B30A0B0C" />
+      <Viewbox Margin="56">
+        <Grid Width="1600" Height="900">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="760" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Border x:Name="JetztCover" Width="720" Height="720" CornerRadius="28"
+                  Background="#1F2225" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <TextBlock x:Name="JetztKuerzel" FontSize="200" FontWeight="Bold" Foreground="White"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <Grid Grid.Column="1" Margin="40,0,0,0">
+            <TextBlock x:Name="JetztUhr" FontSize="44" FontWeight="SemiBold" Foreground="#9A958B"
+                       HorizontalAlignment="Right" VerticalAlignment="Top" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock x:Name="JetztSender" FontSize="26" FontWeight="Bold" Foreground="#5FA790" />
+              <TextBlock x:Name="JetztTitel" FontSize="76" FontWeight="Bold" Foreground="#F2EEE6"
+                         TextWrapping="Wrap" Margin="0,18,0,0" MaxHeight="276" TextTrimming="CharacterEllipsis"
+                         LineHeight="90" LineStackingStrategy="BlockLineHeight" />
+              <TextBlock x:Name="JetztInterpret" FontSize="46" Foreground="#C9C4BA"
+                         TextWrapping="Wrap" Margin="0,16,0,0" MaxHeight="120" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+          </Grid>
+        </Grid>
+      </Viewbox>
+    </Grid>
+
+    <!-- ============================================================= Wortuhr -->
+    <!-- Immer dunkler Grund,
+         wie eine Wortuhr an der Wand; die leuchtenden Buchstaben werden nachts
+         gedämpft (siehe WortuhrZeichnen). Der Viewbox skaliert das Raster auf
+         jede Schirmgröße, ohne die Seitenverhältnisse zu verziehen. -->
+    <Grid x:Name="Uhrebene" Visibility="Collapsed" Background="#0A0B0C"
+          MouseLeftButtonUp="WortuhrSchliessen">
+      <Viewbox Margin="48,40,48,56">
+        <UniformGrid x:Name="Wortfeld" Rows="11" Columns="12" />
+      </Viewbox>
+    </Grid>
+
+  </Grid>
+</Window>

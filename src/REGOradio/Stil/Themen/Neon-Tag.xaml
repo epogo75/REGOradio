@@ -1,0 +1,26 @@
+<!--
+  Neon, Tag. Zurückhaltend: helles Violettgrau mit dunklem Magenta. Neon ist fürs Dunkle gemacht; tagsüber leuchtet nichts, damit „Automatisch“ nicht blendet.
+
+  Alle Tafeln unter Stil/Themen haben dieselben Schlüssel – nur so lässt sich
+  umschalten, ohne die Oberfläche anzufassen. `ThemenPruefung` wacht darüber.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="Grund" Color="#F3F1F7" />
+  <SolidColorBrush x:Key="Flaeche" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Flaeche2" Color="#E9E5F2" />
+  <SolidColorBrush x:Key="Linie" Color="#D8D2E6" />
+  <SolidColorBrush x:Key="LinieStark" Color="#B7AECF" />
+  <SolidColorBrush x:Key="Tinte" Color="#16121F" />
+  <SolidColorBrush x:Key="Tinte2" Color="#4F4766" />
+  <SolidColorBrush x:Key="Tinte3" Color="#655C7E" />
+  <SolidColorBrush x:Key="Akzent" Color="#D1008F" />
+  <SolidColorBrush x:Key="AkzentWeich" Color="#FAD6EF" />
+  <SolidColorBrush x:Key="AkzentTinte" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Warnung" Color="#B0342A" />
+
+  <!-- Kein Leuchten: Das bleibt Neon vorbehalten. -->
+  <x:Null x:Key="Leuchten" />
+
+</ResourceDictionary>
