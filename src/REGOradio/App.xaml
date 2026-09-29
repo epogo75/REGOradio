@@ -1,0 +1,21 @@
+<Application x:Class="REGOradio.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+  <!--
+    ShutdownMode="OnExplicitShutdown": Das Programm lebt im Tray weiter, wenn
+    das Fenster zugeht. Mit der Vorgabe wäre es beim Schließen des letzten
+    Fensters beendet – und der Ton mit ihm.
+  -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Reihenfolge zählt: erst die Farbtafel, dann die Stile, die sich
+             darauf beziehen. Die Tafel wird zur Laufzeit ausgetauscht
+             (siehe App.Farbtafel). -->
+        <ResourceDictionary Source="Stil/Themen/Standard-Tag.xaml" />
+        <ResourceDictionary Source="Stil/Stile.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

@@ -1,0 +1,28 @@
+<!--
+  Neon Grün, Nacht. Grünschwarz mit Säuregrün, so giftig wie ein Leuchtstab – und die laufende Taste leuchtet wirklich (Leuchten, unten).
+
+  Alle Tafeln unter Stil/Themen haben dieselben Schlüssel – nur so lässt sich
+  umschalten, ohne die Oberfläche anzufassen. `ThemenPruefung` wacht darüber.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="Grund" Color="#050A02" />
+  <SolidColorBrush x:Key="Flaeche" Color="#0D1508" />
+  <SolidColorBrush x:Key="Flaeche2" Color="#15210D" />
+  <SolidColorBrush x:Key="Linie" Color="#233A15" />
+  <SolidColorBrush x:Key="LinieStark" Color="#3B6120" />
+  <SolidColorBrush x:Key="Tinte" Color="#F3FFE6" />
+  <SolidColorBrush x:Key="Tinte2" Color="#C0DDA2" />
+  <SolidColorBrush x:Key="Tinte3" Color="#98BA78" />
+  <SolidColorBrush x:Key="Akzent" Color="#8CFF00" />
+  <SolidColorBrush x:Key="AkzentWeich" Color="#1D3300" />
+  <SolidColorBrush x:Key="AkzentTinte" Color="#0A1400" />
+  <SolidColorBrush x:Key="Warnung" Color="#FF7A6B" />
+
+  <!-- Der Leuchtrand der laufenden Taste. Ein Schatten ohne Versatz in der
+       Akzentfarbe – mehr braucht Neon nicht, und auf dem dunklen Grund reicht
+       es, damit man die Taste vom Bett aus findet. -->
+  <DropShadowEffect x:Key="Leuchten" Color="#8CFF00" ShadowDepth="0" BlurRadius="36" Opacity="1" />
+
+</ResourceDictionary>

@@ -1,0 +1,26 @@
+<!--
+  Mitternacht, Nacht. Fast schwarz mit leuchtendem Cyan, wie das Display eines Autoradios.
+
+  Alle Tafeln unter Stil/Themen haben dieselben Schlüssel – nur so lässt sich
+  umschalten, ohne die Oberfläche anzufassen. `ThemenPruefung` wacht darüber.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="Grund" Color="#0A0E14" />
+  <SolidColorBrush x:Key="Flaeche" Color="#121822" />
+  <SolidColorBrush x:Key="Flaeche2" Color="#1A2230" />
+  <SolidColorBrush x:Key="Linie" Color="#243044" />
+  <SolidColorBrush x:Key="LinieStark" Color="#34425A" />
+  <SolidColorBrush x:Key="Tinte" Color="#DCE4F0" />
+  <SolidColorBrush x:Key="Tinte2" Color="#93A1B6" />
+  <SolidColorBrush x:Key="Tinte3" Color="#7A889C" />
+  <SolidColorBrush x:Key="Akzent" Color="#5CC8FF" />
+  <SolidColorBrush x:Key="AkzentWeich" Color="#0F2A3A" />
+  <SolidColorBrush x:Key="AkzentTinte" Color="#06131C" />
+  <SolidColorBrush x:Key="Warnung" Color="#FF8A7A" />
+
+  <!-- Kein Leuchten: Das bleibt Neon vorbehalten. -->
+  <x:Null x:Key="Leuchten" />
+
+</ResourceDictionary>

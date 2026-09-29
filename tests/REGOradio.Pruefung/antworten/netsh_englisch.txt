@@ -1,0 +1,24 @@
+
+There is 1 interface on the system:
+
+    Name                   : Wi-Fi
+    Description            : Intel(R) Wi-Fi 6E AX211 160MHz
+    GUID                   : 3c1f5a2e-8b44-4d9e-9a51-2f7c0d6e1b90
+    Physical address       : a8:64:f1:6d:62:58
+    Interface type         : Primary
+    State                  : connected
+    SSID                   : Hotel Alpenblick
+    AP BSSID               : 94:83:c4:1a:2b:3c
+    Band                   : 2.4 GHz
+    Channel                : 6
+    Network type           : Infrastructure
+    Radio type             : 802.11n
+    Authentication         : Open
+    Cipher                 : None
+    Connection mode        : Auto Connect
+    Receive rate (Mbps)    : 72.2
+    Transmit rate (Mbps)   : 72.2
+    Signal                 : 58%
+    Profile                : Hotel Alpenblick
+
+    Hosted network status  : Not available

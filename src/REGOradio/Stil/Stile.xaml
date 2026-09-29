@@ -1,0 +1,591 @@
+<!--
+  Die Stile. Zwei Regeln bestimmen alles hier:
+
+  **Fingerbreit.** Jede Fläche, die man antippt, ist mindestens 72 Pixel hoch,
+  Stationstasten deutlich mehr. Der Touchscreen des Notebooks wird mit dem
+  Zeigefinger bedient, nicht mit einem Mauszeiger von drei Pixeln.
+
+  **Aus zwei Metern lesbar.** Das Notebook steht auf dem Hoteltisch, man sitzt
+  auf dem Bett. Deshalb große Schrift, keine Grautöne auf Grau, keine
+  Symbole ohne Wort daneben.
+
+  Die Farben kommen über `DynamicResource` – nur so wirkt der Wechsel zwischen
+  Tag und Nacht ohne Neustart.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Die Rundung der Tasten. Das Grundtemplate liest sie per
+       DynamicResource; ein Stil, der andere Ecken will, legt in seinen
+       Style.Resources einen eigenen Wert ab. Fest im Template verdrahtet
+       hätte jede Tastenart ein eigenes Template gebraucht. -->
+  <CornerRadius x:Key="Tastenradius">14</CornerRadius>
+
+  <!-- Grundtaste: alles, was man drückt, sieht so aus. 56 px hoch – die
+       Knöpfe der Kopfzeile; größere Tastenarten setzen mehr. -->
+  <Style x:Key="Taste" TargetType="Button">
+    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="Padding" Value="22,0" />
+    <Setter Property="FontSize" Value="19" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="Background" Value="{DynamicResource Flaeche2}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource LinieStark}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Rahmen"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{DynamicResource Tastenradius}">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center"
+                              Margin="{TemplateBinding Padding}" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <!-- Rückmeldung beim Antippen. Ohne sie tippt man am Touchscreen
+                 zweimal, weil man nicht sieht, ob der erste Druck angekommen
+                 ist. -->
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource AkzentWeich}" />
+              <Setter TargetName="Rahmen" Property="BorderBrush" Value="{DynamicResource Akzent}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Rahmen" Property="Opacity" Value="0.4" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Ein Symbol ohne Wort, quadratisch: WLAN, Ton, Einstellungen oben links.
+       Nur drei, und jedes mit festem Platz – an einem Symbol allein erkennt
+       man die Taste, weil sie immer dort steht. Den Namen tragen sie für die
+       Bedienhilfen von Windows (AutomationProperties.Name). -->
+  <Style x:Key="Symboltaste" TargetType="Button" BasedOn="{StaticResource Taste}">
+    <Setter Property="Width" Value="64" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource Flaeche}" />
+  </Style>
+
+  <!-- Die Haupttaste eines Schirms: eine je Schirm, nicht drei. -->
+  <Style x:Key="Haupttaste" TargetType="Button" BasedOn="{StaticResource Taste}">
+    <Setter Property="Background" Value="{DynamicResource Akzent}" />
+    <Setter Property="Foreground" Value="{DynamicResource AkzentTinte}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Akzent}" />
+  </Style>
+
+  <!-- Stationstaste: Logo, Name, Herkunft. Die Größe gibt das Raster vor –
+       zwölf Tasten, drei Reihen zu vier. -->
+  <Style x:Key="Stationstaste" TargetType="Button" BasedOn="{StaticResource Taste}">
+    <Style.Resources>
+      <CornerRadius x:Key="Tastenradius">18</CornerRadius>
+    </Style.Resources>
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Margin" Value="7" />
+    <Setter Property="Padding" Value="12" />
+    <Setter Property="Background" Value="{DynamicResource Flaeche}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Linie}" />
+  </Style>
+
+  <!-- Die laufende Station: dicker Rand UND andere Fläche. Farbe allein ist
+       am Abend im Nachtmodus zu wenig. -->
+  <Style x:Key="StationstasteAktiv" TargetType="Button" BasedOn="{StaticResource Stationstaste}">
+    <!-- Im Neon-Thema leuchtet die laufende Taste; in allen anderen ist
+         „Leuchten" leer (x:Null). -->
+    <Setter Property="Effect" Value="{DynamicResource Leuchten}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Akzent}" />
+    <Setter Property="BorderThickness" Value="3" />
+    <Setter Property="Background" Value="{DynamicResource AkzentWeich}" />
+  </Style>
+
+  <!-- Eine freie Taste: gestrichelt umrandet und durchsichtig, damit sie
+       nicht wie ein Sender aussieht. WPF-Rahmen können nicht stricheln,
+       deshalb ein eigenes Template mit einem Rechteck. -->
+  <Style x:Key="StationstasteFrei" TargetType="Button" BasedOn="{StaticResource Stationstaste}">
+    <Setter Property="Foreground" Value="{DynamicResource Tinte2}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <!-- Der Hintergrund kommt vom Stil, nicht fest: Beim Ziehen eines
+               Senders leuchtet die Zieltaste auf, auch eine freie. -->
+          <Grid>
+            <Rectangle RadiusX="18" RadiusY="18" Fill="{TemplateBinding Background}" />
+            <Rectangle x:Name="Strich" RadiusX="18" RadiusY="18" StrokeThickness="2"
+                       StrokeDashArray="4 3" Stroke="{DynamicResource LinieStark}" />
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Margin="{TemplateBinding Padding}" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Strich" Property="Stroke" Value="{DynamicResource Akzent}" />
+              <Setter TargetName="Strich" Property="Fill" Value="{DynamicResource AkzentWeich}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Lauter und leiser als WIEDERHOLTASTE: Ein Tipp ist ein Schritt, wer
+       festhält, fährt weiter – erst nach einer kurzen Pause, damit ein
+       normaler Tipp nicht aus Versehen zwei Schritte macht. Eigenes Template,
+       weil ein Button-Stil nicht auf RepeatButton passt. -->
+  <Style x:Key="Grosswiederholtaste" TargetType="RepeatButton">
+    <Setter Property="MinHeight" Value="104" />
+    <Setter Property="Delay" Value="450" />
+    <Setter Property="Interval" Value="70" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="Background" Value="{DynamicResource Flaeche2}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource LinieStark}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="RepeatButton">
+          <Border x:Name="Rahmen" CornerRadius="20"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource AkzentWeich}" />
+              <Setter TargetName="Rahmen" Property="BorderBrush" Value="{DynamicResource Akzent}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Stumm und Stopp unter dem Balken. -->
+  <Style x:Key="Leistentaste" TargetType="Button" BasedOn="{StaticResource Taste}">
+    <Style.Resources>
+      <CornerRadius x:Key="Tastenradius">18</CornerRadius>
+    </Style.Resources>
+    <Setter Property="MinHeight" Value="72" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <!-- Stopp ist dunkel gefüllt: Es ist die eine Taste, die den Ton beendet,
+       und sie soll sich von „Stumm" daneben unterscheiden, ohne dass man
+       lesen muss. -->
+  <Style x:Key="Stopptaste" TargetType="Button" BasedOn="{StaticResource Leistentaste}">
+    <Setter Property="Background" Value="{DynamicResource Tinte}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Tinte}" />
+    <Setter Property="Foreground" Value="{DynamicResource Grund}" />
+  </Style>
+
+  <Style x:Key="Ueberschrift" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="34" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+  </Style>
+
+  <Style x:Key="Zeile" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="20" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte2}" />
+  </Style>
+
+  <Style x:Key="Kleiner" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte3}" />
+  </Style>
+
+  <!-- Eingabefeld, groß genug für den Finger und für die Bildschirmtastatur
+       von Windows, die sich bei Toucheingabe von selbst öffnet. -->
+  <Style x:Key="Eingabe" TargetType="TextBox">
+    <Setter Property="MinHeight" Value="76" />
+    <Setter Property="FontSize" Value="28" />
+    <Setter Property="Padding" Value="18,10" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Background" Value="{DynamicResource Flaeche}" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource LinieStark}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+
+  <!-- ===================================================== Lautstärke
+       Der Balken ist das, was man am häufigsten anfasst – deshalb 112 px
+       breit und so hoch wie das halbe Fenster. Ein Schieber von 20 Pixeln,
+       wie ihn Windows mitbringt, trifft der Finger am Touchscreen nicht.
+
+       Unten leise, oben laut, so wie man es von jedem Mischpult kennt. Ein
+       senkrechter Track hat sein Minimum von sich aus unten; mit
+       `IsDirectionReversed` stand es oben, und der Balken füllte sich von der
+       Decke her – im ersten Bau so gesehen. Die untere Wiederholtaste des
+       Tracks ist die gefüllte Fläche: Sie wächst mit dem Wert, ohne dass
+       jemand eine Höhe ausrechnen muss. -->
+  <Style x:Key="LeereWiederholtaste" TargetType="RepeatButton">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="RepeatButton">
+          <Border Background="Transparent" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Die Füllung unter dem Griff: ein schlichtes Rechteck. Die Rundung
+       kommt von der Maske der Säule, nicht von hier – sonst entstehen an der
+       Naht zwischen Füllung und Griff Kerben. -->
+  <Style x:Key="GefuellteWiederholtaste" TargetType="RepeatButton" BasedOn="{StaticResource LeereWiederholtaste}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <!-- Zwei Punkte nach oben über den eigenen Platz hinaus, unter den
+             Griff: Griff und Füllung stoßen sonst auf halben Pixeln
+             aneinander, und dazwischen scheint eine helle Naht durch. Seit
+             die Fläche skaliert wird, hilft UseLayoutRounding allein nicht
+             mehr – beim Skalieren entstehen die halben Pixel neu. -->
+        <ControlTemplate TargetType="RepeatButton">
+          <Border Background="{DynamicResource Akzent}" Margin="0,-2,0,0" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Der Griff IST die Oberkante der Füllung – kein Knopf, der darüber
+       schwebt. Im ersten Bau war er eine Pille mit weißer Fläche über dem
+       Grün, und das sah aus wie zwei Dinge, die nicht zusammengehören. Ein
+       kurzer Strich zeigt, dass man hier anfassen kann. 48 px hoch, damit
+       der Strich auch bei Lautstärke 0 nicht in den Lautsprecher darunter
+       läuft. -->
+  <Style x:Key="Lautstaerkegriff" TargetType="Thumb">
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Thumb">
+          <Border Background="{DynamicResource Akzent}">
+            <Border Width="36" Height="4" CornerRadius="2" VerticalAlignment="Top" Margin="0,10,0,0"
+                    Background="{DynamicResource AkzentTinte}" Opacity="0.7" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Die Säule. Füllung, Griff und Lautsprecher liegen in einem Raster, das
+       eine runde Maske beschneidet – `ClipToBounds` schneidet nur eckig, und
+       im ersten Bau stand die Füllung unten über die Rundung hinaus. Die
+       Maske ist ein Rahmen mit derselben Rundung, der unter allem liegt; die
+       VisualBrush übernimmt seine Form. Der Lautsprecher unten macht die Säule
+       auch ohne Beschriftung als Lautstärke erkennbar. -->
+  <Style x:Key="Lautstaerkebalken" TargetType="Slider">
+    <Setter Property="Orientation" Value="Vertical" />
+    <Setter Property="Minimum" Value="0" />
+    <Setter Property="Maximum" Value="100" />
+    <Setter Property="IsMoveToPointEnabled" Value="True" />
+    <Setter Property="Width" Value="112" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Slider">
+          <!-- UseLayoutRounding: Griff und Füllung liegen sonst auf halben
+               Pixeln aneinander, und zwischen ihnen scheint eine helle Naht
+               durch. -->
+          <Border CornerRadius="26" Padding="7" UseLayoutRounding="True"
+                  Background="{DynamicResource Flaeche2}"
+                  BorderBrush="{DynamicResource Linie}" BorderThickness="1">
+            <Grid>
+              <Border x:Name="Maske" CornerRadius="19" Background="{DynamicResource Flaeche2}" />
+              <Grid>
+                <Grid.OpacityMask>
+                  <VisualBrush Visual="{Binding ElementName=Maske}" />
+                </Grid.OpacityMask>
+                <Track x:Name="PART_Track">
+                  <Track.DecreaseRepeatButton>
+                    <RepeatButton Style="{StaticResource GefuellteWiederholtaste}" Command="Slider.DecreaseLarge" />
+                  </Track.DecreaseRepeatButton>
+                  <Track.IncreaseRepeatButton>
+                    <RepeatButton Style="{StaticResource LeereWiederholtaste}" Command="Slider.IncreaseLarge" />
+                  </Track.IncreaseRepeatButton>
+                  <Track.Thumb>
+                    <Thumb Style="{StaticResource Lautstaerkegriff}" />
+                  </Track.Thumb>
+                </Track>
+                <Path IsHitTestVisible="False" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                      Margin="0,0,0,8" Width="24" Height="24" Stretch="None"
+                      Stroke="{DynamicResource AkzentTinte}" StrokeThickness="2"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                      Data="M11,5 L6,9 H3 V15 H6 L11,19 Z M15.5,8.5 A5,5 0 0 1 15.5,15.5 M18.5,5.5 A9,9 0 0 1 18.5,18.5" />
+              </Grid>
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ===================================================== Helligkeit
+       Der liegende Bruder der Lautstärkesäule: gleiche Maske, gleicher Griff
+       als Kante der Füllung, nur quer. Eigene Füllung und eigener Griff, weil
+       deren Überlappung (die zwei Punkte gegen die Naht) hier nach rechts
+       gehen muss, nicht nach oben. -->
+  <Style x:Key="GefuellteQuertaste" TargetType="RepeatButton" BasedOn="{StaticResource LeereWiederholtaste}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="RepeatButton">
+          <Border Background="{DynamicResource Akzent}" Margin="0,0,-2,0" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="Quergriff" TargetType="Thumb">
+    <Setter Property="Width" Value="40" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Thumb">
+          <Border Background="{DynamicResource Akzent}">
+            <Border Width="4" Height="26" CornerRadius="2" HorizontalAlignment="Right" Margin="0,0,10,0"
+                    Background="{DynamicResource AkzentTinte}" Opacity="0.7" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="Helligkeitsbalken" TargetType="Slider">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Setter Property="Minimum" Value="5" />
+    <Setter Property="Maximum" Value="100" />
+    <Setter Property="IsMoveToPointEnabled" Value="True" />
+    <Setter Property="Height" Value="52" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Slider">
+          <Border CornerRadius="16" Padding="6" UseLayoutRounding="True"
+                  Background="{DynamicResource Flaeche2}"
+                  BorderBrush="{DynamicResource LinieStark}" BorderThickness="1">
+            <Grid>
+              <Border x:Name="Maske" CornerRadius="11" Background="{DynamicResource Flaeche2}" />
+              <Grid>
+                <Grid.OpacityMask>
+                  <VisualBrush Visual="{Binding ElementName=Maske}" />
+                </Grid.OpacityMask>
+                <Track x:Name="PART_Track">
+                  <Track.DecreaseRepeatButton>
+                    <RepeatButton Style="{StaticResource GefuellteQuertaste}" Command="Slider.DecreaseLarge" />
+                  </Track.DecreaseRepeatButton>
+                  <Track.IncreaseRepeatButton>
+                    <RepeatButton Style="{StaticResource LeereWiederholtaste}" Command="Slider.IncreaseLarge" />
+                  </Track.IncreaseRepeatButton>
+                  <Track.Thumb>
+                    <Thumb Style="{StaticResource Quergriff}" />
+                  </Track.Thumb>
+                </Track>
+              </Grid>
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ===================================================== Aufklappliste
+       Für die Themenwahl. Die ganze Fläche ist der Knopf (ClickMode Press:
+       am Touchscreen klappt sie beim Berühren auf, nicht erst beim
+       Loslassen), die Einträge sind so hoch wie eine Fingerkuppe. -->
+  <Style x:Key="Auswahleintrag" TargetType="ComboBoxItem">
+    <Setter Property="MinHeight" Value="52" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ComboBoxItem">
+          <Border x:Name="Rahmen" CornerRadius="10" Padding="14,0" Background="Transparent">
+            <ContentPresenter VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+              <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource Flaeche2}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource AkzentWeich}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="Auswahl" TargetType="ComboBox">
+    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="FontSize" Value="17" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="ItemContainerStyle" Value="{StaticResource Auswahleintrag}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ComboBox">
+          <Grid>
+            <ToggleButton Focusable="False" ClickMode="Press" Cursor="Hand"
+                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+              <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                  <Border CornerRadius="14" Background="{DynamicResource Flaeche2}"
+                          BorderBrush="{DynamicResource LinieStark}" BorderThickness="1">
+                    <Path HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0"
+                          Data="M0,0 L7,7 L14,0" Stroke="{DynamicResource Tinte2}" StrokeThickness="2.5"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                  </Border>
+                </ControlTemplate>
+              </ToggleButton.Template>
+            </ToggleButton>
+            <ContentPresenter IsHitTestVisible="False" Margin="18,0,50,0" VerticalAlignment="Center"
+                              Content="{TemplateBinding SelectionBoxItem}"
+                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
+            <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
+                   Focusable="False" PopupAnimation="Fade"
+                   MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+              <Border Margin="0,6,0,0" CornerRadius="14" Padding="5" Background="{DynamicResource Flaeche}"
+                      BorderBrush="{DynamicResource LinieStark}" BorderThickness="1">
+                <ItemsPresenter />
+              </Border>
+            </Popup>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ===================================================== Umschalter
+       Ein Segment eines Umschalters: Notebook | Bluetooth-Box oben, Tag |
+       Nacht | Automatisch in den Einstellungen. Das gewählte Segment ist
+       gefüllt, die anderen durchsichtig – zwei Zustände, die man auch im
+       Nachtmodus aus zwei Metern unterscheidet. -->
+  <Style x:Key="Segment" TargetType="RadioButton">
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="FontSize" Value="17" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="RadioButton">
+          <Border x:Name="Rahmen" CornerRadius="10" Background="Transparent" Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource Akzent}" />
+              <Setter Property="Foreground" Value="{DynamicResource AkzentTinte}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Rahmen" Property="Opacity" Value="0.8" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Der Rahmen um eine Gruppe von Segmenten. -->
+  <Style x:Key="Segmentrahmen" TargetType="Border">
+    <Setter Property="Background" Value="{DynamicResource Flaeche2}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource LinieStark}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="4" />
+  </Style>
+
+  <!-- ===================================================== Kippschalter
+       Eine ganze Zeile ist die Fläche, nicht nur der Schalter rechts: Wer mit
+       dem Finger auf den Text tippt, meint den Schalter. -->
+  <Style x:Key="Schalterzeile" TargetType="CheckBox">
+    <Setter Property="MinHeight" Value="72" />
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="CheckBox">
+          <Border CornerRadius="16" Padding="18,10" Background="{DynamicResource Flaeche}"
+                  BorderBrush="{DynamicResource Linie}" BorderThickness="1">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <ContentPresenter VerticalAlignment="Center" Margin="0,0,16,0" />
+              <Border x:Name="Bahn" Grid.Column="1" Width="64" Height="36" CornerRadius="18"
+                      Background="{DynamicResource LinieStark}">
+                <Border x:Name="Knopf" Width="28" Height="28" CornerRadius="14" Margin="4,0"
+                        HorizontalAlignment="Left" Background="{DynamicResource Flaeche}" />
+              </Border>
+            </Grid>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Bahn" Property="Background" Value="{DynamicResource Akzent}" />
+              <Setter TargetName="Knopf" Property="HorizontalAlignment" Value="Right" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ===================================================== Gerätezeile
+       Eine Zeile je Audiogerät in den Einstellungen. Das gewählte hat einen
+       dicken Rand und einen gefüllten Punkt – Farbe allein reicht im
+       Nachtmodus nicht. -->
+  <Style x:Key="Geraetezeile" TargetType="RadioButton">
+    <Setter Property="MinHeight" Value="80" />
+    <Setter Property="Margin" Value="0,0,0,10" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="RadioButton">
+          <Border x:Name="Rahmen" CornerRadius="16" Padding="18,10"
+                  Background="{DynamicResource Flaeche}"
+                  BorderBrush="{DynamicResource Linie}" BorderThickness="1">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Border x:Name="Ring" Width="26" Height="26" CornerRadius="13"
+                      BorderBrush="{DynamicResource LinieStark}" BorderThickness="2"
+                      VerticalAlignment="Center" Margin="0,0,16,0">
+                <Border x:Name="Punkt" Width="12" Height="12" CornerRadius="6"
+                        Background="{DynamicResource Akzent}" Visibility="Collapsed" />
+              </Border>
+              <ContentPresenter Grid.Column="1" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Rahmen" Property="Background" Value="{DynamicResource AkzentWeich}" />
+              <Setter TargetName="Rahmen" Property="BorderBrush" Value="{DynamicResource Akzent}" />
+              <Setter TargetName="Rahmen" Property="BorderThickness" Value="3" />
+              <Setter TargetName="Ring" Property="BorderBrush" Value="{DynamicResource Akzent}" />
+              <Setter TargetName="Ring" Property="BorderThickness" Value="3" />
+              <Setter TargetName="Punkt" Property="Visibility" Value="Visible" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Überschrift eines Abschnitts in den Einstellungen. -->
+  <Style x:Key="Abschnitt" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource Tinte3}" />
+    <Setter Property="Margin" Value="0,0,0,12" />
+  </Style>
+
+</ResourceDictionary>
