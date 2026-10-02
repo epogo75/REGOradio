@@ -26,12 +26,13 @@ Bau 10 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 ## Installieren
 
-Unter [Releases](https://github.com/epogo75/REGOradio/releases) liegen zwei Fassungen:
+Seit Bau 11 gibt es einen Installer: **`REGOradio-Setup-NN.exe`**, auf der NAS unter `Z:\REGOradio\installer`. Er installiert je Benutzer nach `%LOCALAPPDATA%\Programs\REGOradio`, ohne Administratorrechte, bringt die .NET-Laufzeit mit und legt Verknüpfungen in Startmenü und auf dem Schreibtisch an. Ein Update ist derselbe Installer noch einmal; läuft REGOradio dabei (auch nur im Tray), bittet er erst ums Beenden.
 
-* **`REGOradio-x64-eigenstaendig.exe`**: läuft ohne Weiteres auf Windows 10/11 (64 Bit), bringt .NET mit und ist entsprechend groß.
-* **`REGOradio-x64.exe`**: klein, braucht aber die [.NET-9-Laufzeiten](https://dotnet.microsoft.com/download/dotnet/9.0) „Desktop Runtime“ **und** „ASP.NET Core Runtime“ (x64). Ohne die zweite startet das Programm nicht, weil die Handy-Fernbedienung darauf aufsetzt.
+* Eine alte Einzeldatei (`REGOradio-x64*.exe`) im selben Ordner räumt er weg; ein eingeschalteter Autostart zeigt danach auf die neue Datei.
+* Beim Entfernen bleiben Stationstasten und Einstellungen unter `%APPDATA%\REGOradio` stehen; der Autostart-Eintrag geht mit weg.
+* Installer und Programm sind nicht signiert, deshalb warnt Windows SmartScreen beim ersten Start („Weitere Informationen“ → „Trotzdem ausführen“).
 
-Die .exe irgendwohin legen, zum Beispiel nach `%LOCALAPPDATA%\Programs\REGOradio`, und starten. Eine Installation gibt es nicht; Einstellungen und Sender liegen unter `%APPDATA%\REGOradio`. Die Datei ist nicht signiert, deshalb warnt Windows SmartScreen beim ersten Start („Weitere Informationen“ → „Trotzdem ausführen“).
+Die beiden Einzeldateien unter [Releases](https://github.com/epogo75/REGOradio/releases) stammen aus der Zeit davor.
 
 Wer die Handy-Fernbedienung einschaltet, wird von der Windows-Firewall gefragt. Wer dort versehentlich ablehnt, schaltet den Schalter aus und wieder an: REGOradio richtet die Freigabe dann selbst ein.
 
@@ -43,7 +44,16 @@ dotnet test REGOradio.sln
 dotnet publish src/REGOradio/REGOradio.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
 ```
 
-Braucht das .NET-9-SDK. Die eigenständige Fassung entsteht mit `--self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true`.
+Braucht das .NET-9-SDK.
+
+Ausliefern (Prüfungen, eigenständig nach `dist\`, NSIS-Installer nach `dist-installer\`, Spiegel nach `Z:\REGOradio\{installer,programm,quellcode}`), bricht beim ersten Fehler ab:
+
+```
+powershell -NoProfile -ExecutionPolicy Bypass -File liefern.ps1               # mit Spiegel
+powershell -NoProfile -ExecutionPolicy Bypass -File liefern.ps1 -OhneSpiegel  # nur bauen
+```
+
+Braucht NSIS (`winget install NSIS.NSIS`). `installer\REGOradio.nsi` muss UTF-8 **mit** BOM bleiben, sonst kommen die Umlaute im Installer kaputt an; `liefern.ps1` prüft das. Gebündelt wird absichtlich nicht: eine .NET-Einzeldatei entpackt sich beim Start nach Temp, und genau das hat Defender an anderen REGO-Werkzeugen gelöscht.
 
 ## Grundsätze
 
