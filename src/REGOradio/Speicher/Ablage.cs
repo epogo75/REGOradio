@@ -35,7 +35,10 @@ public sealed class Ablage
         Directory.CreateDirectory(_verzeichnis);
     }
 
-    public string SenderDatei => Path.Combine(_verzeichnis, "stationen.json");
+    /// <summary>Der Ordner selbst – für „Über REGOradio", das ihn zeigt und öffnet.</summary>
+    public string Verzeichnis => _verzeichnis;
+
+    public string SenderDatei =>Path.Combine(_verzeichnis, "stationen.json");
     public string EinstellungenDatei => Path.Combine(_verzeichnis, "einstellungen.json");
 
     public List<Sender> SenderLesen() => Lesen<List<Sender>>(SenderDatei) ?? [];

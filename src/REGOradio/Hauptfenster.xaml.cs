@@ -109,6 +109,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
             // Die Rückfrage zuerst: Sie liegt über allem, und Esc heißt dort
             // „doch nicht schließen".
             if (Schliessebene.Visibility == Visibility.Visible) SchliessenAbbrechen(this, e);
+            else if (Ueberebene.Visibility == Visibility.Visible) UeberSchliessen(this, e);
             else if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, e);
             else if (Jetztebene.Visibility == Visibility.Visible) JetztSchliessen(this, e);
             else if (Senderebene.Visibility == Visibility.Visible) SenderSchliessen(this, e);
@@ -1063,6 +1064,67 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     private void EinstellungenSchliessen(object absender, RoutedEventArgs e)
     {
         Einstellungsebene.Visibility = Visibility.Collapsed;
+    }
+
+    // ===================================================== Über REGOradio
+
+    /// <summary>
+    /// Das Blatt „Über REGOradio" – aus den Einstellungen und aus dem
+    /// Tray-Menü. Kommt es aus dem Tray, kann das Fenster versteckt sein oder
+    /// gerade die Wortuhr im Vollbild zeigen; dann erst zurückholen.
+    /// </summary>
+    public void UeberZeigen()
+    {
+        if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, new RoutedEventArgs());
+        if (Jetztebene.Visibility == Visibility.Visible) JetztSchliessen(this, new RoutedEventArgs());
+        UeberOeffnen(this, new RoutedEventArgs());
+    }
+
+    private void UeberOeffnen(object absender, RoutedEventArgs e)
+    {
+        UeberSymbol.Source ??= GroessteFassung(new Uri("pack://application:,,,/symbol.ico"));
+        UeberBau.Text = $"Fassung {Bau.Version} · Bau {Bau.Nummer} · {Bau.Stand}";
+        UeberAblage.Text = _ablage.Verzeichnis;
+        UeberKopf.Background = new LinearGradientBrush(
+            ((SolidColorBrush)FindResource("Flaeche")).Color,
+            ((SolidColorBrush)FindResource("Grund")).Color,
+            new Point(0, 0), new Point(1, 1));
+        Ueberebene.Visibility = Visibility.Visible;
+    }
+
+    private void UeberSchliessen(object absender, RoutedEventArgs e) =>
+        Ueberebene.Visibility = Visibility.Collapsed;
+
+    /// <summary>
+    /// Die größte Fassung aus einer .ico. Ein `Image` mit der .ico als Quelle
+    /// nähme die erste, und das ist in symbol.ico eine der kleinen – auf 112
+    /// Punkte gezogen sähe man die Pixel.
+    /// </summary>
+    private static BitmapSource? GroessteFassung(Uri quelle)
+    {
+        try
+        {
+            var dekoder = BitmapDecoder.Create(quelle, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            return dekoder.Frames.OrderByDescending(f => f.PixelWidth).FirstOrDefault();
+        }
+        catch (Exception fehler) when (fehler is System.IO.IOException or NotSupportedException or System.IO.FileFormatException)
+        {
+            return null;
+        }
+    }
+
+    private void UeberAblageOeffnen(object absender, RoutedEventArgs e)
+    {
+        // UseShellExecute: Ohne das sucht .NET eine ausführbare Datei, findet
+        // einen Ordner und wirft.
+        try
+        {
+            Process.Start(new ProcessStartInfo { FileName = _ablage.Verzeichnis, UseShellExecute = true });
+        }
+        catch (Exception fehler) when (fehler is Win32Exception or System.IO.IOException)
+        {
+            UeberAblage.Text = $"Ließ sich nicht öffnen: {fehler.Message}";
+        }
     }
 
     // ======================================================== Helligkeit

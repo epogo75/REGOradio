@@ -37,6 +37,7 @@ public sealed class Traysymbol : IDisposable
 
         var menue = new ContextMenuStrip();
         menue.Items.Add("Fenster zeigen", null, (_, _) => Zeigen());
+        menue.Items.Add("Über REGOradio", null, (_, _) => { Zeigen(); _fenster.UeberZeigen(); });
         menue.Items.Add(new ToolStripSeparator());
         menue.Items.Add("Beenden", null, (_, _) => Beenden());
         _symbol.ContextMenuStrip = menue;
