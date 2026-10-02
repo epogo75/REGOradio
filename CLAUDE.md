@@ -20,9 +20,12 @@ dotnet test REGOradio.sln
 dotnet test REGOradio.sln --filter "FullyQualifiedName~WlanPruefung"      # eine Klasse
 dotnet test REGOradio.sln --filter "FullyQualifiedName~WlanPruefung.GetrenntIstNichtVerbunden"
 dotnet run --project src/REGOradio/REGOradio.csproj
-dotnet publish src/REGOradio/REGOradio.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
+powershell -NoProfile -ExecutionPolicy Bypass -File liefern.ps1                # prüfen, bauen, Installer, nach Z:\REGOradio
+powershell -NoProfile -ExecutionPolicy Bypass -File liefern.ps1 -OhneSpiegel   # ohne NAS
 powershell -NoProfile -ExecutionPolicy Bypass -File werkzeug\symbol-zeichnen.ps1    # symbol.ico neu zeichnen
 ```
+
+Ausgeliefert wird nur über `liefern.ps1`: eigenständig, aber **nicht** als Einzeldatei nach `dist\`, dann NSIS (`installer\REGOradio.nsi` → `dist-installer\REGOradio-Setup-NN.exe`, NN aus `Version.cs`), dann Spiegel nach `Z:\REGOradio\{installer,programm,quellcode}` mit zwei Vorgängern. Die `.nsi` muss UTF-8 mit BOM bleiben. Der Installer erkennt ein laufendes REGOradio an derselben Mutex-Marke wie `Einzelstart.cs` (`Local\REGOradio-einmal`) – wer die umbenennt, muss beide ändern. „Fertig“ heißt: gepusht und auf `Z:` gespiegelt.
 
 Läuft das Programm noch, scheitert der Bau am gesperrten `REGOradio.exe`; vorher `taskkill /IM REGOradio.exe /F`. Das Fenster schließen reicht nicht, es lebt im Tray weiter.
 

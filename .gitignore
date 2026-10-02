@@ -6,3 +6,5 @@ obj/
 TestResults/
 publish/
 release/
+dist/
+dist-installer/
