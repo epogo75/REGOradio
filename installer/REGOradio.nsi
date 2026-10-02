@@ -60,18 +60,26 @@ VIAddVersionKey "FileVersion"     "${FASSUNG}.0.${BAUNUMMER}"
 !define MUI_ICON   "..\src\REGOradio\symbol.ico"
 !define MUI_UNICON "..\src\REGOradio\symbol.ico"
 
+; DPI-FÄHIG. Ohne das zieht Windows bei 150 % das ganze Fenster als Bild
+; auf, und alles darin wird unscharf – gemeldet für Bau 13 als „total grob
+; und verpixelt".
+ManifestDPIAware true
+
 ; Der Schriftzug links auf Begrüßungs- und Abschlussseite (seit Bau 13).
-; Gezeichnet von werkzeug\installerbild-zeichnen.ps1, in 150 % der
-; Grundgröße, damit er auf dem Dell scharf ist.
-!define MUI_WELCOMEFINISHPAGE_BITMAP "willkommen.bmp"
+; Gezeichnet von werkzeug\installerbild-zeichnen.ps1 in fünf Größen;
+; BildWaehlen legt vor jeder der beiden Seiten das passende hin. MUI2 streckt
+; das Bild sonst mit LoadImage, und das wirft Pixel weg, statt zu rechnen.
+!define MUI_WELCOMEFINISHPAGE_BITMAP "willkommen-100.bmp"
 
 !define MUI_WELCOMEPAGE_TITLE "${NAME} einrichten"
 !define MUI_WELCOMEPAGE_TEXT  "Internetradio für Windows, mit großen Tasten für den Finger: Sender suchen, auf eine Stationstaste legen, hören. Der Ton geht an jedes Windows-Audiogerät, auch an eine gekoppelte Bluetooth-Box.$\r$\n$\r$\nInstalliert wird für den angemeldeten Benutzer, ohne Administratorrechte. Die .NET-Laufzeit kommt mit; es muss nichts weiter installiert sein.$\r$\n$\r$\nStationstasten und Einstellungen bleiben bei einem Update erhalten."
 
+!define MUI_PAGE_CUSTOMFUNCTION_PRE BildWaehlen
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
+!define MUI_PAGE_CUSTOMFUNCTION_PRE BildWaehlen
 !define MUI_FINISHPAGE_RUN "$INSTDIR\REGOradio.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "${NAME} jetzt starten"
 !insertmacro MUI_PAGE_FINISH
@@ -80,6 +88,29 @@ VIAddVersionKey "FileVersion"     "${FASSUNG}.0.${BAUNUMMER}"
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "German"
+
+; Das Bild für die Skalierung des Bildschirms. MUI2 hat beim Start schon die
+; 100-%-Fassung nach $PLUGINSDIR gelegt; hier wird sie überschrieben, bevor
+; die Seite sie lädt. Gewählt wird die nächstkleinere Stufe, damit eher um
+; ein Pixel gestreckt als gestaucht wird.
+Function BildWaehlen
+  System::Call 'user32::GetDpiForWindow(p$HWNDPARENT)i.r0'
+  ${If} $0 <= 0
+    ; Vor Windows 10: die Auflösung des Bildschirms.
+    System::Call 'user32::GetDC(p0)p.r1'
+    System::Call 'gdi32::GetDeviceCaps(pr1,i90)i.r0'
+    System::Call 'user32::ReleaseDC(p0,pr1)'
+  ${EndIf}
+  ${If} $0 >= 192
+    File "/oname=$PLUGINSDIR\modern-wizard.bmp" "willkommen-200.bmp"
+  ${ElseIf} $0 >= 168
+    File "/oname=$PLUGINSDIR\modern-wizard.bmp" "willkommen-175.bmp"
+  ${ElseIf} $0 >= 144
+    File "/oname=$PLUGINSDIR\modern-wizard.bmp" "willkommen-150.bmp"
+  ${ElseIf} $0 >= 120
+    File "/oname=$PLUGINSDIR\modern-wizard.bmp" "willkommen-125.bmp"
+  ${EndIf}
+FunctionEnd
 
 ; Läuft REGOradio? Ergebnis in $0: 0 = nein. SYNCHRONIZE (0x00100000) reicht,
 ; um eine fremde Marke zu öffnen.

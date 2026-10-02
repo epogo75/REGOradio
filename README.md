@@ -9,14 +9,14 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 13 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 14 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
 * spielt MP3, AAC, HE-AAC, HLS, FLAC und Ogg über Windows selbst
 * Titel und Cover des laufenden Lieds, „Jetzt läuft" im Vollbild
 * große Lautstärkesäule, Einzelschritte, Stumm
-* Kopfzeile nur mit Symbolen: WLAN (Sprung ins WLAN-Menü), Ton (Notebook oder Bluetooth-Box), Einstellungen; die Uhr rechts
+* Kopfzeile mit Schriftzug links und Uhr rechts; die drei Symboltasten stehen links untereinander: WLAN (Sprung ins WLAN-Menü), Ton (Notebook oder Bluetooth-Box), Einstellungen (seit Bau 14)
 * Tag, Nacht oder automatisch, dazu sechs Farbthemen (Standard, Holiday, Mitternacht, Neon Pink/Grün/Blau); Bildschirmhelligkeit; Wortuhr im Vollbild
 * Tray, Autostart, kein Ruhezustand während Radio läuft
 * läuft nur einmal: ein zweiter Start holt das Fenster des laufenden nach vorn (seit Bau 11)
