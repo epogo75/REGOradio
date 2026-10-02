@@ -103,8 +103,21 @@ public sealed class Einstellungen
     /// <summary>Welche Stationstaste beim Start wieder gespielt wird. 0: keine.</summary>
     public int LetzterPlatz { get; set; }
 
-    /// <summary>Ob das Programm beim Schließen des Fensters im Tray weiterläuft.</summary>
+    /// <summary>
+    /// Ob das Programm beim Schließen des Fensters im Tray weiterläuft. Gilt
+    /// nur, wenn nicht gefragt wird (<see cref="SchliessenFragen"/>).
+    /// </summary>
     public bool ImTrayBleiben { get; set; } = true;
+
+    /// <summary>
+    /// Ob beim Schließen kurz gefragt wird: in den Tray oder ganz beenden.
+    ///
+    /// Gewünscht seit Bau 11. Vorher entschied allein <see cref="ImTrayBleiben"/>,
+    /// und wer es nicht wusste, suchte nach dem Schließen das Radio, das im
+    /// Tray weiterspielte. Wer „Nicht mehr fragen" ankreuzt, setzt dieses Feld
+    /// zurück und legt damit zugleich <see cref="ImTrayBleiben"/> fest.
+    /// </summary>
+    public bool SchliessenFragen { get; set; } = true;
 
     /// <summary>
     /// Ob der Rechner wach bleibt, solange Radio läuft. Abschaltbar, weil es

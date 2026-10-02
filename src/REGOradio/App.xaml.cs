@@ -1,11 +1,14 @@
 using System.Windows;
 
+using REGOradio.Anzeige;
+
 namespace REGOradio;
 
 public partial class App : Application
 {
     private Hauptfenster? _fenster;
     private Traysymbol? _tray;
+    private Einzelstart? _einzelstart;
 
     /// <summary>Tag oder Nacht -- die Farbtafel, die gerade gilt.</summary>
     public bool IstNacht { get; private set; }
@@ -33,11 +36,31 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // NUR EINMAL. Läuft REGOradio schon, holt dieser Start dessen Fenster
+        // nach vorn und geht – siehe Einzelstart. Beim Autostart weckt er
+        // nicht: wer den Rechner hochfährt, will kein Fenster.
+        _einzelstart = Einzelstart.Versuchen();
+        if (!_einzelstart.Erster)
+        {
+            if (!e.Args.Contains("--tray")) _einzelstart.Wecken();
+            _einzelstart.Dispose();
+            _einzelstart = null;
+            Shutdown();
+            return;
+        }
+
+        // Der Rahmen im Thema, für jedes Fenster, das ab jetzt aufgeht.
+        Fensterkleid.Einschalten();
+
         // Tag oder Nacht entscheidet das Hauptfenster -- es kennt die
         // Einstellung (Tag, Nacht, Automatisch), und es tut das, bevor es
         // sich zeigt. Niemand soll um 23 Uhr erst geblendet werden.
         _fenster = new Hauptfenster();
         _tray = new Traysymbol(_fenster);
+
+        // Ein zweiter Start meldet sich hier. Der Horcher läuft auf einem
+        // eigenen Faden, das Fenster gehört dem Oberflächenfaden.
+        _einzelstart.Lauschen(() => Dispatcher.InvokeAsync(() => _tray?.Zeigen()));
 
         // Beim Autostart mit Windows still ins Tray: Wer den Rechner
         // hochfährt, will kein Fenster, das sich über alles legt. Die letzte
@@ -65,11 +88,27 @@ public partial class App : Application
             Source = new Uri($"Stil/Themen/{name}-{(nacht ? "Nacht" : "Tag")}.xaml", UriKind.Relative),
         };
         Resources.MergedDictionaries[0] = neue;
+
+        // Die Titelleiste malt Windows, nicht WPF – sie folgt der neuen Tafel
+        // nicht von selbst.
+        Fensterkleid.Alle();
+    }
+
+    /// <summary>
+    /// Windows fährt herunter oder meldet ab: nicht fragen, sondern beenden.
+    /// Eine Rückfrage, auf die niemand antwortet, hielte das Herunterfahren
+    /// auf – und das Radio verstummt dabei ohnehin.
+    /// </summary>
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+    {
+        _fenster?.WirklichSchliessen();
+        base.OnSessionEnding(e);
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         _tray?.Dispose();
+        _einzelstart?.Dispose();
         base.OnExit(e);
     }
 }

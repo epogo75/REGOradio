@@ -106,7 +106,10 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         KeyDown += (_, e) =>
         {
             if (e.Key != System.Windows.Input.Key.Escape) return;
-            if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, e);
+            // Die Rückfrage zuerst: Sie liegt über allem, und Esc heißt dort
+            // „doch nicht schließen".
+            if (Schliessebene.Visibility == Visibility.Visible) SchliessenAbbrechen(this, e);
+            else if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, e);
             else if (Jetztebene.Visibility == Visibility.Visible) JetztSchliessen(this, e);
             else if (Senderebene.Visibility == Visibility.Visible) SenderSchliessen(this, e);
             else if (Einstellungsebene.Visibility == Visibility.Visible) EinstellungenSchliessen(this, e);
@@ -1044,7 +1047,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         ThemaWahl.SelectedItem = App.Themen.FirstOrDefault(t => t.Schluessel == ((App)Application.Current).Thema);
         _themaWirdGezeigt = false;
 
-        TrayBleibenSchalter.IsChecked = _einstellungen.ImTrayBleiben;
+        SchliessartZeigen();
         RuhezustandSchalter.IsChecked = _einstellungen.KeinRuhezustand;
         // Nachsehen, nicht erinnern: Der Autostart lässt sich auch im
         // Task-Manager abschalten.
@@ -1227,7 +1230,6 @@ public partial class Hauptfenster : Window, IFernsteuerbar
 
     private void VerhaltenGeaendert(object absender, RoutedEventArgs e)
     {
-        _einstellungen.ImTrayBleiben = TrayBleibenSchalter.IsChecked == true;
         _einstellungen.KeinRuhezustand = RuhezustandSchalter.IsChecked == true;
         _ablage.EinstellungenSchreiben(_einstellungen);
         Wachhalter.Setzen(_laeuft && _einstellungen.KeinRuhezustand);
@@ -1465,26 +1467,131 @@ public partial class Hauptfenster : Window, IFernsteuerbar
 
     // ================================================= Fenster und Tray
 
+    /// <summary>Ob <see cref="WirklichSchliessen"/> schon gelaufen ist.</summary>
+    private bool _beendet;
+
     /// <summary>
-    /// Zugeklappt heißt nicht beendet -- sofern so eingestellt. Das Programm
-    /// läuft im Tray weiter und spielt weiter; genau dafür ist es da. Beendet
-    /// wird über das Tray-Menü.
+    /// Zugeklappt heißt nicht unbedingt beendet. Seit Bau 11 wird gefragt –
+    /// in den Tray oder ganz beenden –, sofern das nicht abgestellt ist; dann
+    /// gilt die gespeicherte Wahl. Siehe <see cref="Schliessregel"/>.
+    ///
+    /// **Ist schon beendet, wird nicht mehr gefragt.** Das Tray-Menü „Beenden"
+    /// und das Herunterfahren von Windows rufen erst <see cref="WirklichSchliessen"/>
+    /// und dann <c>Shutdown</c>, und <c>Shutdown</c> schließt dieses Fenster
+    /// noch einmal. Bis Bau 10 landete das hier in „im Tray bleiben" und wurde
+    /// nur deshalb nicht zum Fehler, weil WPF ein Abbrechen beim Herunterfahren
+    /// übergeht. Mit der Rückfrage hätte es gefragt, während das Programm schon
+    /// geht.
     /// </summary>
     protected override void OnClosing(CancelEventArgs e)
     {
-        if (_einstellungen.ImTrayBleiben)
+        if (_beendet)
         {
-            e.Cancel = true;
-            Hide();
+            base.OnClosing(e);
             return;
         }
+
+        e.Cancel = true;
+
+        switch (Schliessregel.Entscheiden(_einstellungen.SchliessenFragen, _einstellungen.ImTrayBleiben))
+        {
+            case Schliessart.Fragen:
+                SchliessfrageZeigen();
+                break;
+            case Schliessart.Tray:
+                Hide();
+                break;
+            default:
+                Beenden();
+                break;
+        }
+    }
+
+    private void Beenden()
+    {
         WirklichSchliessen();
         Application.Current.Shutdown();
-        base.OnClosing(e);
+    }
+
+    private void SchliessfrageZeigen()
+    {
+        // Das Blatt liegt in der skalierten Fläche, das Vollbild darüber.
+        // Erst heraus aus dem Vollbild, sonst fragt das Programm hinter einem
+        // Bild, das niemand wegtippt.
+        if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, new RoutedEventArgs());
+        if (Jetztebene.Visibility == Visibility.Visible) JetztSchliessen(this, new RoutedEventArgs());
+
+        // Auch aus der Taskleiste lässt sich ein verkleinertes Fenster
+        // schließen – dann muss es erst wieder zu sehen sein.
+        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+        Activate();
+
+        SchliessHinweis.Text = _laeuft
+            ? "Im Tray spielt das Radio weiter – ein Doppelklick auf das Symbol unten rechts holt das Fenster zurück. Beenden hält das Radio an."
+            : "Im Tray bleibt REGOradio griffbereit – ein Doppelklick auf das Symbol unten rechts holt das Fenster zurück.";
+        SchliessenMerken.IsChecked = false;
+        Schliessebene.Visibility = Visibility.Visible;
+    }
+
+    private void SchliessenInDenTray(object absender, RoutedEventArgs e) => SchliessenMit(Schliessart.Tray);
+
+    private void SchliessenBeenden(object absender, RoutedEventArgs e) => SchliessenMit(Schliessart.Beenden);
+
+    private void SchliessenAbbrechen(object absender, RoutedEventArgs e) =>
+        Schliessebene.Visibility = Visibility.Collapsed;
+
+    private void SchliessenMit(Schliessart wahl)
+    {
+        Schliessebene.Visibility = Visibility.Collapsed;
+
+        // „Nicht mehr fragen": Die Antwort wird zur Einstellung, und die
+        // Auswahl in den Einstellungen zeigt sie – dort lässt sich das Fragen
+        // auch wieder einschalten.
+        if (SchliessenMerken.IsChecked == true)
+        {
+            _einstellungen.SchliessenFragen = false;
+            _einstellungen.ImTrayBleiben = wahl == Schliessart.Tray;
+            _ablage.EinstellungenSchreiben(_einstellungen);
+            SchliessartZeigen();
+        }
+
+        if (wahl == Schliessart.Tray) Hide();
+        else Beenden();
+    }
+
+    /// <summary>Die Auswahl in den Einstellungen nach dem gespeicherten Stand setzen.</summary>
+    private void SchliessartZeigen()
+    {
+        var art = Schliessregel.Entscheiden(_einstellungen.SchliessenFragen, _einstellungen.ImTrayBleiben);
+        SchliessenFragenWahl.IsChecked = art == Schliessart.Fragen;
+        SchliessenTrayWahl.IsChecked = art == Schliessart.Tray;
+        SchliessenBeendenWahl.IsChecked = art == Schliessart.Beenden;
+    }
+
+    private void SchliessartGewaehlt(object absender, RoutedEventArgs e)
+    {
+        if (absender is not FrameworkElement { Tag: string tag }
+            || !Enum.TryParse<Schliessart>(tag, out var art))
+        {
+            return;
+        }
+
+        _einstellungen.SchliessenFragen = art == Schliessart.Fragen;
+
+        // Bei "Fragen" bleibt die letzte Wahl stehen: Sie ist die Antwort für
+        // den Tag, an dem jemand das Fragen wieder abstellt.
+        if (art != Schliessart.Fragen) _einstellungen.ImTrayBleiben = art == Schliessart.Tray;
+
+        _ablage.EinstellungenSchreiben(_einstellungen);
     }
 
     public void WirklichSchliessen()
     {
+        // Nur einmal: Tray-Menü, Herunterfahren und Rückfrage führen alle
+        // hierher, und der Abspieler verträgt kein zweites Dispose.
+        if (_beendet) return;
+        _beendet = true;
+
         // Den Webdienst anhalten, bevor das Programm geht -- nicht auf dem
         // Oberflächenfaden warten, Kestrel braucht ihn dafür nicht.
         Task.Run(() => _dienst.Anhalten()).Wait(TimeSpan.FromSeconds(2));

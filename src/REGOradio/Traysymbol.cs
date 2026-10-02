@@ -54,7 +54,8 @@ public sealed class Traysymbol : IDisposable
         _symbol.Text = text.Length <= 63 ? text : text[..60] + "…";
     }
 
-    private void Zeigen()
+    /// <summary>Das Fenster zurückholen – auch, wenn ein zweiter Start darum bittet.</summary>
+    public void Zeigen()
     {
         _fenster.Show();
         if (_fenster.WindowState == WindowState.Minimized) _fenster.WindowState = WindowState.Normal;
