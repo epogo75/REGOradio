@@ -26,6 +26,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File werkzeug\symbol-zeichnen.ps1
 
 Läuft das Programm noch, scheitert der Bau am gesperrten `REGOradio.exe`; vorher `taskkill /IM REGOradio.exe /F`. Das Fenster schließen reicht nicht, es lebt im Tray weiter.
 
+Auf einem Rechner mit nur der .NET-10-Laufzeit (dem Baurechner) brechen `dotnet test` und der Start mit „framework 9.0.0 not found" ab. Dann vorher `$env:DOTNET_ROLL_FORWARD = 'Major'` setzen; das Projekt bleibt bei .NET 9.
+
 `Bau.Nummer` in `src/REGOradio/Version.cs` wird bei jeder ausgelieferten Änderung erhöht, `Stand` bekommt das Datum. Commit-Titel: `Bau NN: <was sich ändert>`.
 
 ## Architektur
@@ -63,7 +65,9 @@ Läuft das Programm noch, scheitert der Bau am gesperrten `REGOradio.exe`; vorhe
 - `Stil/Stile.xaml`: Tastenrundung über die Ressource `Tastenradius`, die ein Stil in `Style.Resources` überschreiben kann. Die Lautstärkesäule (`Lautstaerkebalken`) ist ein senkrechter Slider mit eigener Vorlage: Füllung und Griff sind Rechtecke, die Rundung kommt von einer `VisualBrush`-Maske (`ClipToBounds` schneidet nur eckig). Minimum liegt unten, **ohne** `IsDirectionReversed`. +/− sind Wiederholtasten mit Einzelschritten; gespeichert wird die Lautstärke erst, wenn sie 600 ms ruht.
 - Symbole in der Oberfläche sind `Path`-Strichzeichnungen im 24er-Raster (`Window.Resources`), die über den Stil `Symbol` die Schriftfarbe ihrer Taste übernehmen.
 - Programmsymbol: `werkzeug/symbol-zeichnen.ps1` zeichnet `src/REGOradio/symbol.ico`. Bis 64 px klassische 32-Bit-Bitmaps, 128/256 als PNG: `System.Drawing.Icon` (und damit das Tray-Symbol) kann PNG-Einträge nicht lesen. Unter 24 px eigene Maße, sonst laufen Punkt und Bogen zusammen.
-- Tray: `Traysymbol.cs` über `System.Windows.Forms.NotifyIcon`. `ShutdownMode="OnExplicitShutdown"`: Fenster schließen versteckt nur (sofern „Im Tray weiterspielen" an ist), beendet wird über das Tray-Menü.
+- Tray: `Traysymbol.cs` über `System.Windows.Forms.NotifyIcon`. `ShutdownMode="OnExplicitShutdown"`: Was beim Schließen des Fensters passiert, entscheidet `Schliessregel` (Bau 11): fragen (Vorgabe), in den Tray oder beenden. Gefragt wird im Blatt `Schliessebene` (letzte Ebene in der skalierten Fläche, vorher wird ein Vollbild verlassen); „Nicht mehr fragen" schreibt `SchliessenFragen = false` und `ImTrayBleiben`. In den Einstellungen sind es drei Felder statt zweier Schalter – die Spalte hat keinen Rollbalken. `WirklichSchliessen` läuft nur einmal (`_beendet`): Tray-Menü, Herunterfahren (`App.OnSessionEnding`) und Rückfrage führen alle dorthin, und `Shutdown` schließt das Fenster danach noch einmal – ohne die Sperre würde dann gefragt.
+- Nur eine Instanz: `Einzelstart.cs` (benannter Mutex `Local\REGOradio-einmal`, Weckereignis `Local\REGOradio-wecken`). Ein zweiter Start weckt den ersten, der über `Traysymbol.Zeigen` sein Fenster zeigt, und beendet sich; mit `--tray` (Autostart) weckt er nicht. Debug- und Release-Bau sperren sich gegenseitig.
+- Rahmen im Thema: `Anzeige/Fensterkleid.cs` färbt Titelleiste, Titelschrift und Rand per DWM aus `Grund`, `Tinte`, `Linie` (Klassen-Handler auf `Window.Loaded`, nach `App.Farbtafel` erneut über `Fensterkleid.Alle()`). Dasselbe Mittel wie REGOdj `Ui/Fensterkleid.cs`. Nur Windows 11; DWM lässt die Farben setzen, aber nicht zurücklesen – prüfen lässt es sich nur mit Blick auf den Bildschirm.
 
 ## Feste Regeln
 

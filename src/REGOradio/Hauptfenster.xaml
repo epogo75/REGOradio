@@ -421,10 +421,31 @@
             </ComboBox>
 
             <TextBlock Style="{StaticResource Abschnitt}" Text="VERHALTEN" Margin="0,16,0,10" />
-            <CheckBox x:Name="TrayBleibenSchalter" Style="{StaticResource Schalterzeile}" MinHeight="56" Margin="0,0,0,10"
-                      Click="VerhaltenGeaendert">
-              <TextBlock Text="Im Tray weiterspielen, wenn das Fenster zugeht" TextWrapping="Wrap" />
-            </CheckBox>
+            <!-- WAS BEIM SCHLIESSEN PASSIERT – drei Felder statt zwei Schalter.
+                 Hier stand bis Bau 10 nur „Im Tray weiterspielen". Mit der
+                 Rückfrage (Bau 11) wären es zwei Schalter geworden, von denen
+                 der zweite nur gilt, wenn der erste aus ist – und eine Zeile
+                 mehr in einer Spalte ohne Rollbalken, die schon einmal über den
+                 Rand lief. Drei Felder sind so hoch wie der alte Schalter und
+                 sagen genau, was geschieht: siehe Schliessregel. -->
+            <Border Style="{StaticResource Segmentrahmen}" Padding="5" Margin="0,0,0,10">
+              <UniformGrid Columns="3">
+                <RadioButton x:Name="SchliessenFragenWahl" Style="{StaticResource Segment}" GroupName="Schliessen"
+                             MinHeight="56" Padding="4,0" FontSize="15" Click="SchliessartGewaehlt" Tag="Fragen">
+                  <TextBlock Text="Beim Schließen fragen" TextWrapping="Wrap" TextAlignment="Center" />
+                </RadioButton>
+                <RadioButton x:Name="SchliessenTrayWahl" Style="{StaticResource Segment}" GroupName="Schliessen"
+                             MinHeight="56" Padding="4,0" FontSize="15" Click="SchliessartGewaehlt" Tag="Tray"
+                             ToolTip="Das Fenster geht zu, das Radio spielt im Tray weiter">
+                  <TextBlock Text="Schließen: in den Tray" TextWrapping="Wrap" TextAlignment="Center" />
+                </RadioButton>
+                <RadioButton x:Name="SchliessenBeendenWahl" Style="{StaticResource Segment}" GroupName="Schliessen"
+                             MinHeight="56" Padding="4,0" FontSize="15" Click="SchliessartGewaehlt" Tag="Beenden"
+                             ToolTip="Das Fenster geht zu, das Radio verstummt">
+                  <TextBlock Text="Schließen: beenden" TextWrapping="Wrap" TextAlignment="Center" />
+                </RadioButton>
+              </UniformGrid>
+            </Border>
             <CheckBox x:Name="RuhezustandSchalter" Style="{StaticResource Schalterzeile}" MinHeight="56" Margin="0,0,0,10"
                       Click="VerhaltenGeaendert">
               <TextBlock Text="Kein Ruhezustand, solange Radio läuft" TextWrapping="Wrap" />
@@ -502,6 +523,47 @@
           </Button>
           <TextBlock FontSize="15" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}"
                      Text="Öffnet die Bluetooth-Einstellungen von Windows. Eine gekoppelte Box erscheint danach hier in der Liste." />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- ===================================================== Schließen? -->
+    <!-- Gewünscht seit Bau 11: „beim Schließen kurz fragen – komplett oder in
+         den Tray?". Vorher entschied eine Einstellung still, und wer sie nicht
+         kannte, suchte nach dem Schließen das Radio, das im Tray weiterlief.
+
+         Ein Blatt und kein eigenes Fenster: am Touchscreen sind es dieselben
+         großen Tasten wie überall, und es liegt im Thema. Als letzte Ebene,
+         damit es über jedem anderen Blatt steht. Ein Tipp auf den dunklen
+         Grund oder Esc bricht ab – das Fenster bleibt dann offen. -->
+    <Grid x:Name="Schliessebene" Visibility="Collapsed">
+      <Border Background="#800E0F10" MouseLeftButtonUp="SchliessenAbbrechen" />
+      <Border Width="720" VerticalAlignment="Center" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1"
+              CornerRadius="24" Padding="32,26">
+        <StackPanel>
+          <TextBlock Text="REGOradio schließen?" FontSize="30" FontWeight="Bold" />
+          <TextBlock x:Name="SchliessHinweis" FontSize="17" Margin="0,10,0,22" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Tinte2}" />
+
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="16" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <!-- In den Tray ist die Vorgabe und deshalb die Haupttaste: Es
+                 entspricht dem, was REGOradio bis Bau 10 immer tat, und es
+                 verliert nichts. Beenden hält das Radio an. -->
+            <Button Grid.Column="0" Style="{StaticResource Haupttaste}" MinHeight="76"
+                    Content="In den Tray" IsDefault="True" Click="SchliessenInDenTray" />
+            <Button Grid.Column="2" Style="{StaticResource Taste}" MinHeight="76"
+                    Content="Ganz beenden" Click="SchliessenBeenden" />
+          </Grid>
+
+          <CheckBox x:Name="SchliessenMerken" Style="{StaticResource Schalterzeile}" MinHeight="56" Margin="0,18,0,0">
+            <TextBlock Text="Nicht mehr fragen (in den Einstellungen wieder einschaltbar)" TextWrapping="Wrap" />
+          </CheckBox>
         </StackPanel>
       </Border>
     </Grid>

@@ -19,6 +19,9 @@ Bau 10 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 * Kopfzeile nur mit Symbolen: WLAN (Sprung ins WLAN-Menü), Ton (Notebook oder Bluetooth-Box), Einstellungen; die Uhr rechts
 * Tag, Nacht oder automatisch, dazu sechs Farbthemen (Standard, Holiday, Mitternacht, Neon Pink/Grün/Blau); Bildschirmhelligkeit; Wortuhr im Vollbild
 * Tray, Autostart, kein Ruhezustand während Radio läuft
+* läuft nur einmal: ein zweiter Start holt das Fenster des laufenden nach vorn (seit Bau 11)
+* beim Schließen kurz gefragt: in den Tray oder ganz beenden – oder fest eingestellt (seit Bau 11)
+* Titelleiste und Fensterrand im gewählten Farbthema, wie in REGOdj (seit Bau 11, Windows 11)
 * Handy als Fernbedienung: QR-Code abfotografieren, vierstellige PIN, dann Sender, Lautstärke, Stumm und Stopp vom Handy; dazu umschalten, was das Notebook zeigt (Bedienung, Cover, Uhr), und hinter dem Zahnrad die Helligkeit
 
 ## Installieren
