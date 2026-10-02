@@ -343,8 +343,15 @@
 
           <Grid Grid.Row="0" Margin="0,0,0,22">
             <TextBlock Text="Einstellungen" FontSize="32" FontWeight="Bold" VerticalAlignment="Center" />
-            <Button Style="{StaticResource Haupttaste}" Content="Fertig" HorizontalAlignment="Right"
-                    MinWidth="140" Click="EinstellungenSchliessen" />
+            <!-- „Über" neben „Fertig" und nicht unten bei der Versionszeile:
+                 Die Spalten darüber haben keinen Rollbalken, und eine Zeile
+                 mehr am Fuß nähme ihnen die Höhe. -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+              <Button Style="{StaticResource Taste}" Content="Über REGOradio" Margin="0,0,12,0"
+                      Click="UeberOeffnen" />
+              <Button Style="{StaticResource Haupttaste}" Content="Fertig"
+                      MinWidth="140" Click="EinstellungenSchliessen" />
+            </StackPanel>
           </Grid>
 
           <Grid Grid.Row="1">
@@ -523,6 +530,109 @@
           </Button>
           <TextBlock FontSize="15" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}"
                      Text="Öffnet die Bluetooth-Einstellungen von Windows. Eine gekoppelte Box erscheint danach hier in der Liste." />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- ====================================================== Über REGOradio -->
+    <!-- Gewünscht seit Bau 12, „wie in REGOdj": dort ist „Über" ein eigenes
+         Fenster mit Kopfstreifen. Hier ein Blatt wie Ton und Schließen, weil
+         REGOradio am Touchscreen keine Fenster stapelt. Was man in diesem
+         Blatt sucht, ist dasselbe wie dort: welcher Bau, wo die Ablage
+         liegt, was von anderen drinsteckt.
+
+         Das Symbol oben ist symbol.ico selbst, in seiner größten Fassung –
+         wer werkzeug/symbol-zeichnen.ps1 ändert, ändert es hier mit. -->
+    <Grid x:Name="Ueberebene" Visibility="Collapsed">
+      <Border Background="#800E0F10" MouseLeftButtonUp="UeberSchliessen" />
+      <Border Width="760" VerticalAlignment="Center" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1"
+              CornerRadius="24" ClipToBounds="True">
+        <StackPanel>
+          <!-- Kopf: Symbol, Name, Bau. Der Grund läuft von der Fläche ins
+               Blatt, ein Hauch Akzent oben rechts – dasselbe Mittel wie der
+               Kopfstreifen in REGOdj, ohne die Platte. -->
+          <!-- Den Verlauf setzt UeberOeffnen: aus XAML gebunden behielte er
+               das Thema, das beim Start galt. -->
+          <Grid x:Name="UeberKopf">
+            <Ellipse Width="380" Height="380" HorizontalAlignment="Right" VerticalAlignment="Top"
+                     Margin="0,-190,-120,0" Opacity="0.22" Fill="{DynamicResource Akzent}">
+              <Ellipse.OpacityMask>
+                <RadialGradientBrush>
+                  <GradientStop Color="#FF000000" Offset="0" />
+                  <GradientStop Color="#00000000" Offset="1" />
+                </RadialGradientBrush>
+              </Ellipse.OpacityMask>
+            </Ellipse>
+            <Border BorderBrush="{DynamicResource Linie}" BorderThickness="0,0,0,1" />
+            <Grid Margin="32,28,32,26">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Image x:Name="UeberSymbol" Width="112" Height="112" VerticalAlignment="Top"
+                     RenderOptions.BitmapScalingMode="HighQuality" />
+              <StackPanel Grid.Column="1" Margin="26,4,0,0" VerticalAlignment="Center">
+                <TextBlock Text="REGOradio" FontSize="40" FontWeight="Bold" />
+                <TextBlock Text="Internetradio für den Finger" FontSize="18" Margin="0,2,0,0"
+                           Foreground="{DynamicResource Tinte2}" />
+                <TextBlock x:Name="UeberBau" FontSize="15" Margin="0,12,0,0"
+                           FontFamily="Consolas" Foreground="{DynamicResource Tinte3}" />
+              </StackPanel>
+            </Grid>
+          </Grid>
+
+          <StackPanel Margin="32,22,32,26">
+            <TextBlock FontSize="17" TextWrapping="Wrap" LineHeight="25"
+                       Text="Sender suchen, auf eine Stationstaste legen, hören. Der Ton geht an jedes Windows-Audiogerät, auch an eine gekoppelte Bluetooth-Box; das Handy wird auf Wunsch zur Fernbedienung." />
+
+            <TextBlock Style="{StaticResource Abschnitt}" Text="VON ANDEREN" Margin="0,22,0,8" />
+            <!-- Kurz, was THIRD-PARTY-NOTICES.md lang sagt. Wer die Liste dort
+                 ändert, ändert sie hier mit. -->
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="24" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <TextBlock Grid.Row="0" FontSize="15" FontWeight="SemiBold" Text="NAudio" />
+              <TextBlock Grid.Row="0" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}"
+                         Text="der Ton · MIT, © Mark Heath" />
+              <TextBlock Grid.Row="1" FontSize="15" FontWeight="SemiBold" Text="QRCoder" Margin="0,4,0,0" />
+              <TextBlock Grid.Row="1" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}" Margin="0,4,0,0"
+                         Text="der Code fürs Handy · MIT, © Raffael Herrmann" />
+              <TextBlock Grid.Row="2" FontSize="15" FontWeight="SemiBold" Text="radio-browser.info" Margin="0,4,0,0" />
+              <TextBlock Grid.Row="2" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}" Margin="0,4,0,0"
+                         Text="das Senderverzeichnis und die Senderlogos" />
+              <TextBlock Grid.Row="3" FontSize="15" FontWeight="SemiBold" Text="iTunes Search" Margin="0,4,0,0" />
+              <TextBlock Grid.Row="3" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}" Margin="0,4,0,0"
+                         Text="die Cover zum laufenden Lied" />
+            </Grid>
+
+            <Grid Margin="0,26,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                <TextBlock Text="© 2026 Stephan Ruf · MIT-Lizenz" FontSize="15" Foreground="{DynamicResource Tinte2}" />
+                <TextBlock x:Name="UeberAblage" FontSize="13" Margin="0,3,0,0" FontFamily="Consolas"
+                           TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Tinte3}" />
+              </StackPanel>
+              <Button Grid.Column="1" Style="{StaticResource Taste}" Content="Ablage öffnen"
+                      Margin="0,0,12,0" Click="UeberAblageOeffnen"
+                      ToolTip="Stationstasten und Einstellungen im Explorer zeigen" />
+              <Button Grid.Column="2" Style="{StaticResource Haupttaste}" Content="Fertig" MinWidth="130"
+                      Click="UeberSchliessen" />
+            </Grid>
+          </StackPanel>
         </StackPanel>
       </Border>
     </Grid>

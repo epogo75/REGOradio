@@ -9,7 +9,7 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 10 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 12 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
@@ -22,6 +22,7 @@ Bau 10 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 * läuft nur einmal: ein zweiter Start holt das Fenster des laufenden nach vorn (seit Bau 11)
 * beim Schließen kurz gefragt: in den Tray oder ganz beenden – oder fest eingestellt (seit Bau 11)
 * Titelleiste und Fensterrand im gewählten Farbthema, wie in REGOdj (seit Bau 11, Windows 11)
+* „Über REGOradio“ in den Einstellungen und im Tray-Menü: Bau, Ablageordner, was von anderen drinsteckt (seit Bau 12)
 * Handy als Fernbedienung: QR-Code abfotografieren, vierstellige PIN, dann Sender, Lautstärke, Stumm und Stopp vom Handy; dazu umschalten, was das Notebook zeigt (Bedienung, Cover, Uhr), und hinter dem Zahnrad die Helligkeit
 
 ## Installieren
