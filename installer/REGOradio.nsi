@@ -60,6 +60,11 @@ VIAddVersionKey "FileVersion"     "${FASSUNG}.0.${BAUNUMMER}"
 !define MUI_ICON   "..\src\REGOradio\symbol.ico"
 !define MUI_UNICON "..\src\REGOradio\symbol.ico"
 
+; Der Schriftzug links auf Begrüßungs- und Abschlussseite (seit Bau 13).
+; Gezeichnet von werkzeug\installerbild-zeichnen.ps1, in 150 % der
+; Grundgröße, damit er auf dem Dell scharf ist.
+!define MUI_WELCOMEFINISHPAGE_BITMAP "willkommen.bmp"
+
 !define MUI_WELCOMEPAGE_TITLE "${NAME} einrichten"
 !define MUI_WELCOMEPAGE_TEXT  "Internetradio für Windows, mit großen Tasten für den Finger: Sender suchen, auf eine Stationstaste legen, hören. Der Ton geht an jedes Windows-Audiogerät, auch an eine gekoppelte Bluetooth-Box.$\r$\n$\r$\nInstalliert wird für den angemeldeten Benutzer, ohne Administratorrechte. Die .NET-Laufzeit kommt mit; es muss nichts weiter installiert sein.$\r$\n$\r$\nStationstasten und Einstellungen bleiben bei einem Update erhalten."
 
