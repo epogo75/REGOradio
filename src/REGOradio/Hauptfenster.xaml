@@ -630,6 +630,11 @@
               </Border>
               <TextBlock x:Name="SchlafHinweis" FontSize="17" Margin="0,14,0,0" TextWrapping="Wrap"
                          Foreground="{DynamicResource Tinte2}" />
+              <!-- Bau 24 -->
+              <CheckBox x:Name="SchlafBildschirmSchalter" Style="{StaticResource Schalterzeile}" Margin="0,14,0,0"
+                        Click="SchlafBildschirmGeaendert">
+                <TextBlock Text="Danach auch den Bildschirm ausschalten" TextWrapping="Wrap" />
+              </CheckBox>
             </StackPanel>
 
             <!-- Wecker -->

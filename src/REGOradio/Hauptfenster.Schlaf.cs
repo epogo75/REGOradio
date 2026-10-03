@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
+using REGOradio.Anzeige;
 using REGOradio.Modelle;
 using REGOradio.Uhr;
 
@@ -50,6 +51,12 @@ public partial class Hauptfenster
             {
                 Stoppen(this, new RoutedEventArgs());
                 SchlafBeenden();
+                // Bau 24: Wer einschläft, will es dunkel. Ein Tipp holt den
+                // Bildschirm zurück.
+                if (_einstellungen.SchlafBildschirmAus)
+                {
+                    Bildschirm.Ausschalten(new System.Windows.Interop.WindowInteropHelper(this).EnsureHandle());
+                }
             }
             else
             {
@@ -118,6 +125,7 @@ public partial class Hauptfenster
     private void SchlafOeffnen(object absender, RoutedEventArgs e)
     {
         _weckerWirdGezeigt = true;
+        SchlafBildschirmSchalter.IsChecked = _einstellungen.SchlafBildschirmAus;
         WeckerSchalter.IsChecked = _einstellungen.WeckerAn;
         WeckerTaeglich.IsChecked = _einstellungen.WeckerTage == "taeglich";
         WeckerWerktags.IsChecked = _einstellungen.WeckerTage == "werktags";
@@ -160,7 +168,15 @@ public partial class Hauptfenster
         }
         SchlafHinweis.Text = _laufender is null
             ? $"Läuft gerade nichts. Wer jetzt einen Sender wählt, hört ihn bis {ende:HH:mm}."
-            : $"Wird ab {ende.AddMinutes(-1):HH:mm} leiser und geht um {ende:HH:mm} aus ({Wecker.Abstand(ende - DateTime.Now)}).";
+            : $"Wird ab {ende.AddMinutes(-1):HH:mm} leiser und geht um {ende:HH:mm} aus ({Wecker.Abstand(ende - DateTime.Now)})"
+              + (_einstellungen.SchlafBildschirmAus ? ", der Bildschirm mit." : ".");
+    }
+
+    private void SchlafBildschirmGeaendert(object absender, RoutedEventArgs e)
+    {
+        _einstellungen.SchlafBildschirmAus = SchlafBildschirmSchalter.IsChecked == true;
+        _ablage.EinstellungenSchreiben(_einstellungen);
+        SchlafHinweisZeigen();
     }
 
     private void WeckerGeaendert(object absender, RoutedEventArgs e)
