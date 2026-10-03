@@ -9,7 +9,7 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 19 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 20 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
@@ -23,6 +23,7 @@ Bau 19 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 * beim Schließen kurz gefragt: in den Tray oder ganz beenden – oder fest eingestellt (seit Bau 11)
 * Titelleiste und Fensterrand im gewählten Farbthema, wie in REGOdj (seit Bau 11, Windows 11)
 * „Über REGOradio“ in den Einstellungen und im Tray-Menü: Bau, Ablageordner, was von anderen drinsteckt (seit Bau 12)
+* Einschlafen (15–90 Minuten, die letzte Minute wird leiser) und Wecker (Uhrzeit, täglich/Mo–Fr/einmal, Stationstaste; fängt leise an und wird in zwei Minuten lauter). Schläft der Rechner, weckt ihn eine geplante Aufgabe von Windows eine Minute vorher – soweit die Energieoptionen das zulassen (seit Bau 20)
 * Stationstasten sichern und einlesen, mit Logos, als eine Datei `*.regoradio` – unter „Mehr“; beim Einlesen werden die bisherigen Tasten ersetzt und vorher selbst gesichert (seit Bau 19)
 * „Was lief vorhin?“: die letzten 50 Lieder mit Uhrzeit, Cover und Sender, auch nach einem Neustart; vierte Taste links (seit Bau 18)
 * tote Sender repariert es selbst: reißt der Strom ab, wird einmal neu verbunden; spielt ein Sender gar nicht, sucht REGOradio im Verzeichnis seine neue Adresse und legt sie auf die Taste, sobald sie spielt (seit Bau 17)

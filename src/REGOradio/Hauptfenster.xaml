@@ -167,6 +167,14 @@
                   ToolTip="Was lief vorhin?">
             <Path Style="{StaticResource Symbol}" Data="{StaticResource IconVerlauf}" />
           </Button>
+
+          <!-- Einschlafen und Wecken (Bau 20). Der Rahmen färbt sich im
+               Akzent, solange eines von beiden gestellt ist. -->
+          <Button x:Name="SchlafKnopf" Style="{StaticResource Symboltaste}" Margin="0,12,0,0"
+                  Click="SchlafOeffnen" AutomationProperties.Name="Einschlafen und Wecken"
+                  ToolTip="Einschlafen und Wecken">
+            <Path Style="{StaticResource Symbol}" Data="{StaticResource IconMond}" />
+          </Button>
         </StackPanel>
 
         <!-- Neun Felder: acht Sender und „Mehr". Ein Raster von drei mal drei
@@ -555,6 +563,90 @@
           <TextBlock FontSize="15" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}"
                      Text="Öffnet die Bluetooth-Einstellungen von Windows. Eine gekoppelte Box erscheint danach hier in der Liste." />
         </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- ============================================== Einschlafen und Wecken -->
+    <!-- Bau 20. Links das Einschlafen, rechts der Wecker; die Logik steht in
+         `Uhr/Wecker.cs`, die Verdrahtung in `Hauptfenster.Schlaf.cs`. Alles
+         mit großen Tasten statt Eingabefeldern – das Blatt bedient man vom
+         Bett aus. -->
+    <Grid x:Name="Schlafebene" Visibility="Collapsed">
+      <Border Background="#800E0F10" MouseLeftButtonUp="SchlafSchliessen" />
+      <Border Width="1060" VerticalAlignment="Center" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1"
+              CornerRadius="24" Padding="30,24">
+        <DockPanel>
+          <Grid DockPanel.Dock="Top" Margin="0,0,0,18">
+            <TextBlock Text="Einschlafen und Wecken" FontSize="30" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Style="{StaticResource Haupttaste}" Content="Fertig" HorizontalAlignment="Right"
+                    MinWidth="130" Click="SchlafSchliessen" />
+          </Grid>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="34" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Einschlafen -->
+            <StackPanel Grid.Column="0">
+              <TextBlock Style="{StaticResource Abschnitt}" Text="EINSCHLAFEN" />
+              <Border Style="{StaticResource Segmentrahmen}" Padding="5">
+                <UniformGrid Columns="5">
+                  <RadioButton x:Name="SchlafAus" Style="{StaticResource Segment}" GroupName="Schlaf" Padding="2,0"
+                               MinHeight="60" Tag="0" Click="SchlafzeitGewaehlt" Content="Aus" />
+                  <RadioButton Style="{StaticResource Segment}" GroupName="Schlaf" Padding="2,0"
+                               MinHeight="60" Tag="15" Click="SchlafzeitGewaehlt" Content="15 Min" />
+                  <RadioButton Style="{StaticResource Segment}" GroupName="Schlaf" Padding="2,0"
+                               MinHeight="60" Tag="30" Click="SchlafzeitGewaehlt" Content="30 Min" />
+                  <RadioButton Style="{StaticResource Segment}" GroupName="Schlaf" Padding="2,0"
+                               MinHeight="60" Tag="60" Click="SchlafzeitGewaehlt" Content="60 Min" />
+                  <RadioButton Style="{StaticResource Segment}" GroupName="Schlaf" Padding="2,0"
+                               MinHeight="60" Tag="90" Click="SchlafzeitGewaehlt" Content="90 Min" />
+                </UniformGrid>
+              </Border>
+              <TextBlock x:Name="SchlafHinweis" FontSize="17" Margin="0,14,0,0" TextWrapping="Wrap"
+                         Foreground="{DynamicResource Tinte2}" />
+            </StackPanel>
+
+            <!-- Wecker -->
+            <StackPanel Grid.Column="2">
+              <TextBlock Style="{StaticResource Abschnitt}" Text="WECKER" />
+              <CheckBox x:Name="WeckerSchalter" Style="{StaticResource Schalterzeile}" Click="WeckerGeaendert">
+                <TextBlock Text="Wecker gestellt" TextWrapping="Wrap" />
+              </CheckBox>
+              <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="WeckerZeit" FontSize="60" FontWeight="SemiBold" VerticalAlignment="Center"
+                           Margin="0,0,18,0" Text="06:45" />
+                <UniformGrid Grid.Column="1" Columns="2" Rows="2">
+                  <Button Style="{StaticResource Taste}" Content="+ 1 Std" Margin="0,0,6,6" Tag="60" Click="WeckzeitAendern" />
+                  <Button Style="{StaticResource Taste}" Content="+ 5 Min" Margin="6,0,0,6" Tag="5" Click="WeckzeitAendern" />
+                  <Button Style="{StaticResource Taste}" Content="− 1 Std" Margin="0,6,6,0" Tag="-60" Click="WeckzeitAendern" />
+                  <Button Style="{StaticResource Taste}" Content="− 5 Min" Margin="6,6,0,0" Tag="-5" Click="WeckzeitAendern" />
+                </UniformGrid>
+              </Grid>
+              <Border Style="{StaticResource Segmentrahmen}" Padding="5" Margin="0,14,0,0">
+                <UniformGrid Columns="3">
+                  <RadioButton x:Name="WeckerTaeglich" Style="{StaticResource Segment}" GroupName="Wecktage"
+                               Tag="taeglich" Click="WecktageGewaehlt" Content="Täglich" />
+                  <RadioButton x:Name="WeckerWerktags" Style="{StaticResource Segment}" GroupName="Wecktage"
+                               Tag="werktags" Click="WecktageGewaehlt" Content="Mo–Fr" />
+                  <RadioButton x:Name="WeckerEinmal" Style="{StaticResource Segment}" GroupName="Wecktage"
+                               Tag="einmal" Click="WecktageGewaehlt" Content="Einmal" />
+                </UniformGrid>
+              </Border>
+              <ComboBox x:Name="WeckerSender" Style="{StaticResource Auswahl}" Margin="0,14,0,0"
+                        SelectionChanged="WeckersenderGewaehlt" AutomationProperties.Name="Mit welchem Sender wecken" />
+              <TextBlock x:Name="WeckerHinweis" FontSize="17" Margin="0,14,0,0" TextWrapping="Wrap"
+                         Foreground="{DynamicResource Tinte2}" />
+            </StackPanel>
+          </Grid>
+        </DockPanel>
       </Border>
     </Grid>
 
