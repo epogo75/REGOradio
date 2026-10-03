@@ -91,6 +91,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         _ = HomepagesNachholen();
         MedienAnmelden();
         SchlafAnmelden();
+        LautheitAnmelden();
         LautstaerkeZeigen(_einstellungen.Lautstaerke);
         LaufendesZeigen();
         UhrZeigen();
@@ -592,6 +593,8 @@ public partial class Hauptfenster : Window, IFernsteuerbar
 
     private void Spielen(Sender sender)
     {
+        // Was am bisherigen Sender gemessen wurde, vor dem Wechsel sichern.
+        LautheitMerken();
         _laufender = sender;
         _zuletzt = sender;
         // Wer selbst wählt, beendet eine laufende Suche nach Ersatz.
@@ -599,13 +602,14 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         _hinweis = "";
         _einstellungen.LetzterPlatz = sender.Platz;
         _ablage.EinstellungenSchreiben(_einstellungen);
-        _abspieler.Spiele(sender.Adresse, sender.Name);
+        _abspieler.Spiele(sender.Adresse, sender.Name, sender.Lautheit);
         LaufendesZeigen();
         TastenZeichnen();
     }
 
     private void Stoppen(object absender, RoutedEventArgs e)
     {
+        LautheitMerken();
         _abspieler.Stopp();
         _laufender = null;
         _einstellungen.LetzterPlatz = 0;
@@ -1071,6 +1075,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     private void TonOeffnen(object absender, RoutedEventArgs e)
     {
         GeraetelisteZeichnen();
+        AngleichenZeigen();
         Tonebene.Visibility = Visibility.Visible;
     }
 
