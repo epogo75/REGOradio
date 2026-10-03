@@ -89,6 +89,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         DarstellungAnwenden();
         TastenZeichnen();
         _ = HomepagesNachholen();
+        MedienAnmelden();
         LautstaerkeZeigen(_einstellungen.Lautstaerke);
         LaufendesZeigen();
         UhrZeigen();
@@ -589,6 +590,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     private void Spielen(Sender sender)
     {
         _laufender = sender;
+        _zuletzt = sender;
         _einstellungen.LetzterPlatz = sender.Platz;
         _ablage.EinstellungenSchreiben(_einstellungen);
         _abspieler.Spiele(sender.Adresse, sender.Name);
@@ -701,6 +703,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
 
         _coverAdresse = "";
         CoverSetzen(null);
+        MedienZeigen();
         _ = CoverLaden(_titelGezeigt, _laufender);
     }
 
@@ -727,6 +730,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         if (icyTitel != _titelGezeigt || sender != _laufender) return;
         _coverAdresse = bild is not null && !istLogo ? coverAdresse : "";
         CoverSetzen(bild, istLogo);
+        MedienZeigen();
     }
 
     /// <summary>Das Bild in die kleine Kachel, ins Vollbild und in den Hintergrund.</summary>
@@ -1705,5 +1709,8 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         _uhr.Stop();
         Wachhalter.Setzen(false);
         _abspieler.Dispose();
+        // Abmelden, sonst zeigt das Lautstärkefenster noch eine Weile einen
+        // Sender, der längst aus ist.
+        _medien?.Dispose();
     }
 }
