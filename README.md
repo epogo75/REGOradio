@@ -9,7 +9,7 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 15 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 16 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
@@ -23,6 +23,7 @@ Bau 15 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 * beim Schließen kurz gefragt: in den Tray oder ganz beenden – oder fest eingestellt (seit Bau 11)
 * Titelleiste und Fensterrand im gewählten Farbthema, wie in REGOdj (seit Bau 11, Windows 11)
 * „Über REGOradio“ in den Einstellungen und im Tray-Menü: Bau, Ablageordner, was von anderen drinsteckt (seit Bau 12)
+* Medientasten der Tastatur und Knöpfe der Bluetooth-Box: Play startet den letzten Sender, Pause/Stopp hält an, Weiter/Zurück gehen zur nächsten Stationstaste; Sender, Titel und Cover im Lautstärkefenster von Windows und auf dem Sperrbildschirm (seit Bau 16)
 * Senderlogos auch für Sender, die im Verzeichnis keines haben: aus dem Kopf ihrer Homepage, sonst von DuckDuckGo (seit Bau 15)
 * Schriftzug wie bei REGOdj: „REGO“ dünn, „radio“ leuchtend im Akzent des Farbthemas – in der Kopfzeile, in „Über“ und im Installer (seit Bau 13)
 * Handy als Fernbedienung: QR-Code abfotografieren, vierstellige PIN, dann Sender, Lautstärke, Stumm und Stopp vom Handy; dazu umschalten, was das Notebook zeigt (Bedienung, Cover, Uhr), und hinter dem Zahnrad die Helligkeit

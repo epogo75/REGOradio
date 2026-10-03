@@ -31,4 +31,22 @@ public static class Tastenbelegung
         if (verdraengt is not null) verdraengt.Platz = von;
         return true;
     }
+
+    /// <summary>
+    /// Die nächste (<paramref name="schritt"/> = 1) oder vorige (−1) belegte
+    /// Taste nach <paramref name="platz"/>, im Kreis – für „Weiter" und
+    /// „Zurück" auf der Medientaste (Bau 16). Freie Tasten werden
+    /// übersprungen. Ist <paramref name="platz"/> 0 (nichts lief, oder ein
+    /// Sender nur zum Anhören), beginnt „Weiter" bei der ersten Taste und
+    /// „Zurück" bei der letzten.
+    /// </summary>
+    public static Sender? Nachbar(IReadOnlyList<Sender> sender, int platz, int schritt)
+    {
+        var belegt = sender.Where(s => s.Platz > 0).OrderBy(s => s.Platz).ToList();
+        if (belegt.Count == 0) return null;
+        if (platz <= 0) return schritt > 0 ? belegt[0] : belegt[^1];
+
+        if (schritt > 0) return belegt.FirstOrDefault(s => s.Platz > platz) ?? belegt[0];
+        return belegt.LastOrDefault(s => s.Platz < platz) ?? belegt[^1];
+    }
 }
