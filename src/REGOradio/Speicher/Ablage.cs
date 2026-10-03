@@ -46,6 +46,12 @@ public sealed class Ablage
     public void SenderSchreiben(IEnumerable<Sender> sender) =>
         Schreiben(SenderDatei, sender.ToList());
 
+    public string VerlaufDatei => Path.Combine(_verzeichnis, "verlauf.json");
+
+    public List<Gespielt> VerlaufLesen() => Lesen<List<Gespielt>>(VerlaufDatei) ?? [];
+
+    public void VerlaufSchreiben(List<Gespielt> verlauf) => Schreiben(VerlaufDatei, verlauf);
+
     public Einstellungen EinstellungenLesen() =>
         Lesen<Einstellungen>(EinstellungenDatei) ?? new Einstellungen();
 
