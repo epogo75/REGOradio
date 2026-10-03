@@ -14,8 +14,8 @@ namespace REGOradio;
 internal static class Bau
 {
     public const string Version = "0.1";
-    public const int Nummer = 14;
-    public const string Stand = "2026-10-02";
+    public const int Nummer = 15;
+    public const string Stand = "2026-10-03";
 
     public const string Programm = "REGOradio";
     public const string Copyright = "© 2026 Stephan Ruf";

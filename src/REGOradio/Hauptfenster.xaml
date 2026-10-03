@@ -610,6 +610,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
               </Grid.RowDefinitions>
               <TextBlock Grid.Row="0" FontSize="15" FontWeight="SemiBold" Text="NAudio" />
               <TextBlock Grid.Row="0" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}"
@@ -623,6 +624,9 @@
               <TextBlock Grid.Row="3" FontSize="15" FontWeight="SemiBold" Text="iTunes Search" Margin="0,4,0,0" />
               <TextBlock Grid.Row="3" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}" Margin="0,4,0,0"
                          Text="die Cover zum laufenden Lied" />
+              <TextBlock Grid.Row="4" FontSize="15" FontWeight="SemiBold" Text="DuckDuckGo" Margin="0,4,0,0" />
+              <TextBlock Grid.Row="4" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}" Margin="0,4,0,0"
+                         Text="Senderlogos, wenn Verzeichnis und Homepage keines haben" />
             </Grid>
 
             <Grid Margin="0,26,0,0">
