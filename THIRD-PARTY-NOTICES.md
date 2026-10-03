@@ -23,5 +23,12 @@ Microsoft.NET.Test.Sdk (MIT).
   Betrieb und hält sie nur lokal vor.
 - **iTunes Search API** (Apple) für Cover zum laufenden Lied. Auch hier wird
   nichts mitgeliefert.
+- **Die Homepages der Sender** (seit Bau 15): Hat ein Sender im Verzeichnis
+  kein Logo, liest REGOradio den Kopf seiner Homepage und nimmt das Symbol,
+  das die Seite selbst angibt.
+- **DuckDuckGo-Symboldienst** (`icons.duckduckgo.com`) als letzter Ausweg für
+  Senderlogos. Er erfährt dabei nur die Domain der Senderhomepage. Die Idee
+  dieser Ausweichkette stammt aus [streborn](https://github.com/JRpersonal/streborn)
+  (MIT, © 2026 Jens Roggenfelder); übernommen wurde kein Code.
 
 Die Schrift (Segoe UI) kommt von Windows und ist nicht Teil von REGOradio.

@@ -14,6 +14,11 @@ public sealed class Sender
     public string Adresse { get; set; } = "";
     /// <summary>Adresse des Senderlogos, oder leer.</summary>
     public string Logo { get; set; } = "";
+    /// <summary>
+    /// Die Homepage des Senders, oder leer. Seit Bau 15: Hat der Sender kein
+    /// eigenes Logo im Verzeichnis, wird es dort gesucht (`Logos.HolenFuer`).
+    /// </summary>
+    public string Homepage { get; set; } = "";
     public string Land { get; set; } = "";
     public string Genre { get; set; } = "";
     public string Codec { get; set; } = "";
@@ -33,6 +38,7 @@ public sealed class Treffer
     public string Name { get; init; } = "";
     public string Adresse { get; init; } = "";
     public string Logo { get; init; } = "";
+    public string Homepage { get; init; } = "";
     public string Land { get; init; } = "";
     public string Genre { get; init; } = "";
     public string Codec { get; init; } = "";
@@ -44,6 +50,7 @@ public sealed class Treffer
         Name = Name,
         Adresse = Adresse,
         Logo = Logo,
+        Homepage = Homepage,
         Land = Land,
         Genre = Genre,
         Codec = Codec,

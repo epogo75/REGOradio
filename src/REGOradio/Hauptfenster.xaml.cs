@@ -88,6 +88,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
 
         DarstellungAnwenden();
         TastenZeichnen();
+        _ = HomepagesNachholen();
         LautstaerkeZeigen(_einstellungen.Lautstaerke);
         LaufendesZeigen();
         UhrZeigen();
@@ -373,7 +374,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
             ClipToBounds = true,
             Child = new Grid { Children = { kuerzel, logo } },
         };
-        _ = LogoEinsetzen(rahmen, kuerzel, logo, sender.Logo);
+        _ = LogoEinsetzen(rahmen, kuerzel, logo, sender);
         return rahmen;
     }
 
@@ -381,9 +382,45 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     /// Kommt das Logo an, tritt es an die Stelle des Kürzels. Der Grund
     /// darunter ist die Randfarbe des Logos selbst (siehe `Logogrund`).
     /// </summary>
-    private async Task LogoEinsetzen(Border rahmen, TextBlock kuerzel, Image logo, string adresse)
+    /// <summary>
+    /// Stationstasten aus der Zeit vor Bau 15 kennen ihre Homepage nicht – die
+    /// wurde nicht gespeichert. Ohne sie gibt es für Sender ohne Logo im
+    /// Verzeichnis keinen Ersatz. Einmal nachfragen, in einer Anfrage für
+    /// alle, und merken; danach ist die Liste ergänzt und es wird nicht mehr
+    /// gefragt. Ohne Netz bleibt alles, wie es ist, und beim nächsten Start
+    /// wird es wieder versucht.
+    /// </summary>
+    private async Task HomepagesNachholen()
     {
-        var bild = await _logos.Holen(adresse);
+        var offen = _sender.Where(s => s.Homepage.Length == 0 && s.Kennung.Length > 0).ToList();
+        if (offen.Count == 0) return;
+        List<Treffer> treffer;
+        try
+        {
+            treffer = await _katalog.NachKennung(offen.Select(s => s.Kennung));
+        }
+        catch (KatalogFehler)
+        {
+            return;
+        }
+        var neu = false;
+        foreach (var t in treffer.Where(t => t.Homepage.Length > 0))
+        {
+            foreach (var s in offen.Where(s => s.Kennung == t.Kennung))
+            {
+                s.Homepage = t.Homepage;
+                neu = true;
+            }
+        }
+        if (!neu) return;
+        _ablage.SenderSchreiben(_sender);
+        TastenZeichnen();
+        if (_laufender is not null && offen.Contains(_laufender)) LaufendesZeigen();
+    }
+
+    private async Task LogoEinsetzen(Border rahmen, TextBlock kuerzel, Image logo, Sender sender)
+    {
+        var bild = await _logos.HolenFuer(sender.Logo, sender.Homepage);
         if (bild is null) return;
         logo.Source = bild;
         logo.Margin = new Thickness(rahmen.Width * 0.08);
@@ -621,7 +658,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
 
     private async Task LaufendesLogoLaden(Sender sender)
     {
-        var bild = await _logos.Holen(sender.Logo);
+        var bild = await _logos.HolenFuer(sender.Logo, sender.Homepage);
         // Inzwischen umgeschaltet? Dann gehört das Bild nicht mehr hierher.
         if (bild is null || _laufender != sender) return;
         LaufendesLogo.Source = bild;
@@ -684,7 +721,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         }
         if (bild is null && sender is not null)
         {
-            bild = await _logos.Holen(sender.Logo, breite: 400);
+            bild = await _logos.HolenFuer(sender.Logo, sender.Homepage, breite: 400);
             istLogo = bild is not null;
         }
         if (icyTitel != _titelGezeigt || sender != _laufender) return;
@@ -1417,7 +1454,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
             Titel: _titelGezeigt.Length == 0 ? "" : titel,
             Interpret: interpret,
             Cover: _coverAdresse,
-            Logo: _laufender?.Logo ?? "",
+            Logo: _laufender is null ? "" : _logos.Adresse(_laufender.Logo, _laufender.Homepage),
             Lautstaerke: _abspieler.Lautstaerke,
             Stumm: _abspieler.Stumm,
             Helligkeit: helligkeit,
@@ -1429,7 +1466,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     IReadOnlyList<Fernsender> IFernsteuerbar.Sender() => Dispatcher.Invoke(() =>
         (IReadOnlyList<Fernsender>)_sender
             .OrderBy(s => s.Platz)
-            .Select(s => new Fernsender(s.Platz, s.Name, s.Logo, Herkunft(s, mitCodec: false)))
+            .Select(s => new Fernsender(s.Platz, s.Name, _logos.Adresse(s.Logo, s.Homepage), Herkunft(s, mitCodec: false)))
             .ToList());
 
     bool IFernsteuerbar.Spielen(int platz) => Dispatcher.Invoke(() =>

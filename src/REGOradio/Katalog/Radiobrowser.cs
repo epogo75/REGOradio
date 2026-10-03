@@ -57,6 +57,17 @@ public sealed class Radiobrowser(HttpClient? klient = null)
         return await Hole(frage, abbruch);
     }
 
+    /// <summary>
+    /// Sender nach ihren Kennungen, in einer Anfrage. Für Stationstasten aus
+    /// der Zeit vor Bau 15, denen die Homepage fehlt (siehe `Logos.HolenFuer`).
+    /// </summary>
+    public async Task<List<Treffer>> NachKennung(IEnumerable<string> kennungen, CancellationToken abbruch = default)
+    {
+        var liste = string.Join(",", kennungen.Where(k => k.Length > 0).Select(Uri.EscapeDataString));
+        if (liste.Length == 0) return [];
+        return await Hole($"/json/stations/byuuid?uuids={liste}", abbruch);
+    }
+
     private async Task<List<Treffer>> Hole(string frage, CancellationToken abbruch)
     {
         var fehler = new List<Exception>();
@@ -134,6 +145,7 @@ public sealed class Radiobrowser(HttpClient? klient = null)
         // ausliefern statt eines Stroms.
         Adresse = (roh.url_resolved ?? roh.url ?? "").Trim(),
         Logo = (roh.favicon ?? "").Trim(),
+        Homepage = (roh.homepage ?? "").Trim(),
         Land = (roh.country ?? "").Trim(),
         Genre = (roh.tags ?? "").Split(',').FirstOrDefault()?.Trim() ?? "",
         Codec = (roh.codec ?? "").Trim(),
@@ -151,7 +163,8 @@ public sealed class Radiobrowser(HttpClient? klient = null)
         string? country,
         string? tags,
         string? codec,
-        int bitrate);
+        int bitrate,
+        string? homepage = null);
 }
 
 public sealed class KatalogFehler(string meldung, Exception? ursache = null)
