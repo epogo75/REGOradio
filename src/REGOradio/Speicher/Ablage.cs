@@ -165,6 +165,27 @@ public sealed class Einstellungen
     /// </summary>
     public string FernSchluessel { get; set; } = "";
 
+    /// <summary>Ob der Wecker gestellt ist (Bau 20).</summary>
+    public bool WeckerAn { get; set; }
+
+    /// <summary>Weckzeit in Minuten nach Mitternacht; 405 ist 6:45.</summary>
+    public int WeckerMinuten { get; set; } = 6 * 60 + 45;
+
+    /// <summary>"taeglich", "werktags" (Mo–Fr) oder "einmal".</summary>
+    public string WeckerTage { get; set; } = "werktags";
+
+    /// <summary>Welche Stationstaste weckt.</summary>
+    public int WeckerPlatz { get; set; } = 1;
+
+    /// <summary>
+    /// Wann zuletzt geweckt wurde. Auf der Platte, damit ein Neustart
+    /// innerhalb des Weckfensters nicht ein zweites Mal weckt.
+    /// </summary>
+    public DateTime? WeckerZuletzt { get; set; }
+
+    /// <summary>Ob bei Windows ein Weckauftrag angelegt ist, der wieder weg muss.</summary>
+    public bool WeckauftragAngelegt { get; set; }
+
     // „Mit Windows starten" steht NICHT hier. Die Wahrheit darüber ist der
     // Eintrag in der Registry (`Speicher/Autostart.cs`); eine Kopie hier wäre
     // die zweite Fassung derselben Sache und liefe auseinander, sobald jemand

@@ -193,6 +193,11 @@ Section "Uninstall"
   ; ihn unter genau diesem Namen an.
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "REGOradio"
 
+  ; Der Weckauftrag (seit Bau 20) zeigte nach dem Entfernen ebenso ins
+  ; Leere – und weckte den Rechner trotzdem jeden Morgen.
+  nsExec::Exec 'schtasks.exe /Delete /TN "REGOradio Wecker" /F'
+  Pop $0
+
   RMDir /r "$INSTDIR"
   DeleteRegKey HKCU "${SCHLUESSEL}"
 

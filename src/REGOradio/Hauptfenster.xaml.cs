@@ -90,6 +90,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         TastenZeichnen();
         _ = HomepagesNachholen();
         MedienAnmelden();
+        SchlafAnmelden();
         LautstaerkeZeigen(_einstellungen.Lautstaerke);
         LaufendesZeigen();
         UhrZeigen();
@@ -113,6 +114,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
             if (Schliessebene.Visibility == Visibility.Visible) SchliessenAbbrechen(this, e);
             else if (Ueberebene.Visibility == Visibility.Visible) UeberSchliessen(this, e);
             else if (Verlaufebene.Visibility == Visibility.Visible) VerlaufSchliessen(this, e);
+            else if (Schlafebene.Visibility == Visibility.Visible) SchlafSchliessen(this, e);
             else if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, e);
             else if (Jetztebene.Visibility == Visibility.Visible) JetztSchliessen(this, e);
             else if (Senderebene.Visibility == Visibility.Visible) SenderSchliessen(this, e);
@@ -904,6 +906,8 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     {
         // Wer an der Lautstärke dreht, will etwas hören: Stumm ist damit vorbei.
         if (_abspieler.Stumm) StummSetzen(false);
+        // Wer beim Wecken selbst dreht, hat entschieden: kein Anschwellen mehr.
+        _weckStart = null;
 
         _abspieler.Lautstaerke = wert;
         _einstellungen.Lautstaerke = _abspieler.Lautstaerke;
