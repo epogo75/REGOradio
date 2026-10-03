@@ -9,7 +9,7 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 22 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 23 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
@@ -23,6 +23,7 @@ Bau 22 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 * beim Schließen kurz gefragt: in den Tray oder ganz beenden – oder fest eingestellt (seit Bau 11)
 * Titelleiste und Fensterrand im gewählten Farbthema, wie in REGOdj (seit Bau 11, Windows 11)
 * „Über REGOradio“ in den Einstellungen und im Tray-Menü: Bau, Ablageordner, was von anderen drinsteckt (seit Bau 12)
+* im Feld „Läuft“ wischen: nach links der nächste, nach rechts der vorige Sender (seit Bau 23)
 * Hotel-WLAN: verlangt das WLAN eine Anmeldung im Browser, sagt REGOradio das, bietet „WLAN-Anmeldung öffnen“ an und spielt nach der Anmeldung von selbst weiter (seit Bau 22)
 * alle Sender gleich laut: die Lautheit jedes Senders wird beim Hören nach EBU R 128 gemessen, am Sender gemerkt und auf −17 LUFS angeglichen (höchstens −12/+6 dB, langsam nachgeführt); abschaltbar im Blatt „Ton geht an“ (seit Bau 21)
 * Einschlafen (15–90 Minuten, die letzte Minute wird leiser) und Wecker (Uhrzeit, täglich/Mo–Fr/einmal, Stationstaste; fängt leise an und wird in zwei Minuten lauter). Schläft der Rechner, weckt ihn eine geplante Aufgabe von Windows eine Minute vorher – soweit die Energieoptionen das zulassen (seit Bau 20)
