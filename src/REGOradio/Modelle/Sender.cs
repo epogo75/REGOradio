@@ -25,6 +25,12 @@ public sealed class Sender
     public int Bitrate { get; set; }
 
     /// <summary>
+    /// Wie laut der Sender zuletzt gemessen wurde, in LUFS (Bau 21). Damit
+    /// klingt er beim nächsten Mal vom ersten Ton an angeglichen.
+    /// </summary>
+    public double? Lautheit { get; set; }
+
+    /// <summary>
     /// Auf welcher Stationstaste der Sender liegt, von 1 an gezählt. 0 heißt:
     /// auf keiner -- dann steht er nur in der Liste.
     /// </summary>

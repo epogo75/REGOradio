@@ -562,6 +562,13 @@
           </Button>
           <TextBlock FontSize="15" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}"
                      Text="Öffnet die Bluetooth-Einstellungen von Windows. Eine gekoppelte Box erscheint danach hier in der Liste." />
+          <!-- Bau 21: hier, weil es eine Frage des Tons ist – und weil die
+               Spalten der Einstellungen keinen Platz mehr haben. -->
+          <CheckBox x:Name="AngleichenSchalter" Style="{StaticResource Schalterzeile}" Margin="0,14,0,0"
+                    Click="AngleichenGeaendert">
+            <TextBlock Text="Alle Sender gleich laut" TextWrapping="Wrap" />
+          </CheckBox>
+          <TextBlock x:Name="AngleichenHinweis" FontSize="15" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}" />
         </StackPanel>
       </Border>
     </Grid>

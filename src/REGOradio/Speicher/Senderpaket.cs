@@ -94,6 +94,7 @@ public static class Senderpaket
                 Genre = s.Genre ?? "",
                 Codec = s.Codec ?? "",
                 Bitrate = s.Bitrate,
+                Lautheit = s.Lautheit,
                 Platz = s.Platz,
             })
             .ToList();

@@ -68,16 +68,42 @@ public sealed class Abspieler : IDisposable
         };
     }
 
-    public void Spiele(string adresse, string sendername)
+    private Angleicher? _angleicher;
+    private bool _angleichen = true;
+    private double? _bekannteLautheit;
+
+    /// <summary>
+    /// „Alle Sender gleich laut" (Bau 21). Wirkt sofort, auch auf den
+    /// laufenden Sender.
+    /// </summary>
+    public bool Angleichen
+    {
+        get => _angleichen;
+        set
+        {
+            _angleichen = value;
+            if (_angleicher is { } a) a.An = value;
+        }
+    }
+
+    /// <summary>Die gemessene Lautheit des laufenden Senders, sobald sie zählt.</summary>
+    public double? GemesseneLautheit => _angleicher?.Gemessen;
+
+    /// <param name="bekannteLautheit">
+    /// Was beim letzten Mal gemessen wurde (`Sender.Lautheit`) – damit der
+    /// Sender vom ersten Ton an angeglichen klingt.
+    /// </param>
+    public void Spiele(string adresse, string sendername, double? bekannteLautheit = null)
     {
         Stopp();
+        _bekannteLautheit = bekannteLautheit;
         lock (_schloss)
         {
             _sendername = sendername;
             _fehler = "";
             _abbruch = new CancellationTokenSource();
             var marke = _abbruch.Token;
-            _faden = new Thread(() => Schleife(adresse, marke))
+            _faden = new Thread(() => Schleife(adresse, bekannteLautheit, marke))
             {
                 IsBackground = true,
                 Name = "REGOradio-Strom",
@@ -107,6 +133,7 @@ public sealed class Abspieler : IDisposable
             _ausgabe?.Stop();
             _ausgabe?.Dispose();
             _ausgabe = null;
+            _angleicher = null;
             _sendername = "";
             _titel = "";
         }
@@ -168,17 +195,22 @@ public sealed class Abspieler : IDisposable
     {
         _ausgangKennung = kennung;
         if (_ausgabe is null || laufendeAdresse.Length == 0) return;
-        Spiele(laufendeAdresse, sendername);
+        // Was schon gemessen ist, gilt auf dem neuen Gerät weiter.
+        Spiele(laufendeAdresse, sendername, _angleicher?.Gemessen ?? _bekannteLautheit);
     }
 
-    private void Schleife(string adresse, CancellationToken abbruch)
+    private void Schleife(string adresse, double? bekannteLautheit, CancellationToken abbruch)
     {
         MediaFoundationReader? leser = null;
         try
         {
             leser = new MediaFoundationReader(adresse);
             if (abbruch.IsCancellationRequested) return;
-            AusgabeStarten(leser);
+            // Der Angleicher rechnet in Gleitkomma; Media Foundation liefert
+            // meist 16 Bit. WASAPI im geteilten Betrieb nimmt beides.
+            var angleicher = new Angleicher(leser.ToSampleProvider(), bekannteLautheit) { An = _angleichen };
+            _angleicher = angleicher;
+            AusgabeStarten(angleicher.ToWaveProvider());
 
             // Media Foundation liest selbst weiter; dieser Faden wacht nur, ob
             // der Ton noch läuft. Endet der Strom -- der Sender legt auf oder

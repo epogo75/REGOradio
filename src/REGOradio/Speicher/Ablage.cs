@@ -165,6 +165,9 @@ public sealed class Einstellungen
     /// </summary>
     public string FernSchluessel { get; set; } = "";
 
+    /// <summary>„Alle Sender gleich laut" (Bau 21).</summary>
+    public bool Angleichen { get; set; } = true;
+
     /// <summary>Ob der Wecker gestellt ist (Bau 20).</summary>
     public bool WeckerAn { get; set; }
 

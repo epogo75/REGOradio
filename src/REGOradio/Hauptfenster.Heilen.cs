@@ -79,7 +79,7 @@ public partial class Hauptfenster
             HinweisZeigen("Die Verbindung ist abgerissen – verbinde neu …", bleibt: true);
             await Task.Delay(TimeSpan.FromSeconds(3));
             if (_heilung != h || _laufender != sender) return;
-            _abspieler.Spiele(sender.Adresse, sender.Name);
+            _abspieler.Spiele(sender.Adresse, sender.Name, sender.Lautheit);
             return;
         }
 
