@@ -77,6 +77,8 @@
       </Setter>
     </Style>
     <Geometry x:Key="IconUhr">M3,12 A9,9 0 1 1 21,12 A9,9 0 1 1 3,12 M12,7 V12 L15,14</Geometry>
+    <!-- Uhr mit Pfeil zurück: „was lief vorhin". -->
+    <Geometry x:Key="IconVerlauf">M3.5,12 A8.5,8.5 0 1 0 6,6 M3,3.5 V8 H7.5 M12,7.5 V12 L15,14</Geometry>
   </Window.Resources>
 
   <Grid>
@@ -157,6 +159,13 @@
                   Click="EinstellungenOeffnen" AutomationProperties.Name="Einstellungen"
                   ToolTip="Einstellungen">
             <Path Style="{StaticResource Symbol}" Data="{StaticResource IconRegler}" />
+          </Button>
+
+          <!-- Was lief vorhin? (Bau 18) -->
+          <Button Style="{StaticResource Symboltaste}" Margin="0,12,0,0"
+                  Click="VerlaufOeffnen" AutomationProperties.Name="Was lief vorhin?"
+                  ToolTip="Was lief vorhin?">
+            <Path Style="{StaticResource Symbol}" Data="{StaticResource IconVerlauf}" />
           </Button>
         </StackPanel>
 
@@ -541,6 +550,28 @@
           <TextBlock FontSize="15" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Tinte2}"
                      Text="Öffnet die Bluetooth-Einstellungen von Windows. Eine gekoppelte Box erscheint danach hier in der Liste." />
         </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- ==================================================== Was lief vorhin? -->
+    <!-- Bau 18: die letzten Lieder mit Uhrzeit, Cover und Sender. Für „wie hieß
+         das eben?" – die Antwort steht sonst nur so lange da, bis das nächste
+         Lied kommt. Die Zeilen baut `Hauptfenster.Verlauf.cs`. -->
+    <Grid x:Name="Verlaufebene" Visibility="Collapsed">
+      <Border Background="#800E0F10" MouseLeftButtonUp="VerlaufSchliessen" />
+      <Border Width="760" VerticalAlignment="Center" Background="{DynamicResource Grund}"
+              BorderBrush="{DynamicResource LinieStark}" BorderThickness="1"
+              CornerRadius="24" Padding="28,22">
+        <DockPanel>
+          <Grid DockPanel.Dock="Top" Margin="0,0,0,14">
+            <TextBlock Text="Was lief vorhin?" FontSize="30" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Style="{StaticResource Haupttaste}" Content="Fertig" HorizontalAlignment="Right"
+                    MinWidth="130" Click="VerlaufSchliessen" />
+          </Grid>
+          <ScrollViewer MaxHeight="540" VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly">
+            <StackPanel x:Name="Verlaufliste" />
+          </ScrollViewer>
+        </DockPanel>
       </Border>
     </Grid>
 

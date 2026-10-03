@@ -63,9 +63,10 @@
     </Setter>
   </Style>
 
-  <!-- Ein Symbol ohne Wort, quadratisch: WLAN, Ton, Einstellungen oben links.
-       Nur drei, und jedes mit festem Platz – an einem Symbol allein erkennt
-       man die Taste, weil sie immer dort steht. Den Namen tragen sie für die
+  <!-- Ein Symbol ohne Wort, quadratisch: WLAN, Ton, Einstellungen, seit Bau 18
+       „Was lief vorhin?", untereinander am linken Rand. Wenige, und jedes mit
+       festem Platz – an einem Symbol allein erkennt man die Taste, weil sie
+       immer dort steht. Den Namen tragen sie für die
        Bedienhilfen von Windows (AutomationProperties.Name). -->
   <Style x:Key="Symboltaste" TargetType="Button" BasedOn="{StaticResource Taste}">
     <Setter Property="Width" Value="64" />

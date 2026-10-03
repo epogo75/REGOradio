@@ -112,6 +112,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
             // „doch nicht schließen".
             if (Schliessebene.Visibility == Visibility.Visible) SchliessenAbbrechen(this, e);
             else if (Ueberebene.Visibility == Visibility.Visible) UeberSchliessen(this, e);
+            else if (Verlaufebene.Visibility == Visibility.Visible) VerlaufSchliessen(this, e);
             else if (Uhrebene.Visibility == Visibility.Visible) WortuhrSchliessen(this, e);
             else if (Jetztebene.Visibility == Visibility.Visible) JetztSchliessen(this, e);
             else if (Senderebene.Visibility == Visibility.Visible) SenderSchliessen(this, e);
@@ -707,6 +708,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         _coverAdresse = "";
         CoverSetzen(null);
         MedienZeigen();
+        VerlaufMerken();
         _ = CoverLaden(_titelGezeigt, _laufender);
     }
 
@@ -734,6 +736,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         _coverAdresse = bild is not null && !istLogo ? coverAdresse : "";
         CoverSetzen(bild, istLogo);
         MedienZeigen();
+        if (_coverAdresse.Length > 0) VerlaufCover(icyTitel, _coverAdresse);
     }
 
     /// <summary>Das Bild in die kleine Kachel, ins Vollbild und in den Hintergrund.</summary>
