@@ -123,6 +123,37 @@ public sealed class Logos
         }
     }
 
+    /// <summary>
+    /// Die gespeicherten Bytes zu einer Adresse, oder null – fürs Sichern der
+    /// Stationstasten (Bau 19). Fragt nie das Netz.
+    /// </summary>
+    public byte[]? Gespeichert(string adresse)
+    {
+        if (!Brauchbar(adresse)) return null;
+        var datei = Path.Combine(_verzeichnis, Schluessel(adresse));
+        try { return File.Exists(datei) ? File.ReadAllBytes(datei) : null; }
+        catch (IOException) { return null; }
+        catch (UnauthorizedAccessException) { return null; }
+    }
+
+    /// <summary>
+    /// Bytes aus einer Sicherung in den Speicher legen, als wären sie
+    /// geholt worden. Was dort schon liegt, bleibt; eine Fehlanzeige für die
+    /// Adresse fällt weg.
+    /// </summary>
+    public void Vorlegen(string adresse, byte[] bytes)
+    {
+        if (!Brauchbar(adresse) || bytes.Length is 0 or > 2_000_000) return;
+        var datei = Path.Combine(_verzeichnis, Schluessel(adresse));
+        try
+        {
+            if (!File.Exists(datei)) File.WriteAllBytes(datei, bytes);
+            TryLoeschen(datei + ".fehlt");
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+    }
+
     /// <summary>Wie lange ein „hat kein Bild" gilt, bevor wieder gefragt wird.</summary>
     private static readonly TimeSpan Fehltdauer = TimeSpan.FromDays(7);
 
