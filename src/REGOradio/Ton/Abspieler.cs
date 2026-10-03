@@ -48,6 +48,12 @@ public sealed class Abspieler : IDisposable
     private int _lautstaerke = 45;
     private string _ausgangKennung = "";
 
+    /// <summary>
+    /// Die Meldung, wenn ein Strom nach dem Start abreißt. Öffentlich, weil
+    /// das Fenster daran erkennt, dass erst einmal neu verbunden wird (Bau 17).
+    /// </summary>
+    public const string Abrissmeldung = "Der Sender hat aufgehört zu senden.";
+
     /// <summary>Wird gemeldet, sobald sich Fehler oder Laufzustand ändert.</summary>
     public event Action<Tonstand>? StandGeaendert;
 
@@ -182,7 +188,7 @@ public sealed class Abspieler : IDisposable
             {
                 if (_ausgabe is { PlaybackState: PlaybackState.Stopped })
                 {
-                    _fehler = "Der Sender hat aufgehört zu senden.";
+                    _fehler = Abrissmeldung;
                     Melden();
                     break;
                 }
