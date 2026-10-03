@@ -85,6 +85,17 @@ public partial class Hauptfenster
 
         if (h.Rest is null)
         {
+            // Erst fragen, ob es am WLAN liegt (Bau 22). Hängt eine
+            // Anmeldeseite davor, ist kein Sender umgezogen – und die Suche im
+            // Verzeichnis käme auch nicht durch.
+            HinweisZeigen($"{sender.Name} antwortet nicht – prüfe die Verbindung …", bleibt: true);
+            if (await AnmeldungPruefen())
+            {
+                if (_heilung == h) h.Aufgegeben = true;
+                return;
+            }
+            if (_heilung != h || _laufender != sender) return;
+
             HinweisZeigen($"{sender.Name} antwortet nicht – suche eine neue Adresse …", bleibt: true);
             var kandidaten = await KandidatenHolen(sender);
             if (_heilung != h || _laufender != sender) return;
@@ -150,7 +161,7 @@ public partial class Hauptfenster
     /// </summary>
     private void FehlerzeileZeigen(string fehler)
     {
-        var suchtNoch = _heilung is { Aufgegeben: false } && _hinweis.Length > 0;
+        var suchtNoch = (_heilung is { Aufgegeben: false } || _wartetAufAnmeldung) && _hinweis.Length > 0;
         var text = suchtNoch ? _hinweis : fehler.Length > 0 ? fehler : _hinweis;
         FehlerZeile.Text = text;
         FehlerZeile.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;

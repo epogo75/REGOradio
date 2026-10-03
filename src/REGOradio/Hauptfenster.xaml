@@ -222,8 +222,14 @@
               </StackPanel>
             </Grid>
 
-            <TextBlock x:Name="FehlerZeile" Grid.Row="1" FontSize="15" Margin="0,10,0,0"
-                       Foreground="{DynamicResource Warnung}" TextWrapping="Wrap" Visibility="Collapsed" />
+            <StackPanel Grid.Row="1">
+              <TextBlock x:Name="FehlerZeile" FontSize="15" Margin="0,10,0,0"
+                         Foreground="{DynamicResource Warnung}" TextWrapping="Wrap" Visibility="Collapsed" />
+              <!-- Bau 22: nur sichtbar, wenn das WLAN eine Anmeldung im
+                   Browser verlangt. -->
+              <Button x:Name="AnmeldeKnopf" Style="{StaticResource Haupttaste}" Margin="0,10,0,0"
+                      Content="WLAN-Anmeldung öffnen" Visibility="Collapsed" Click="AnmeldungOeffnen" />
+            </StackPanel>
 
             <!-- Das Lied: Cover, Titel, Interpret. Die ganze Fläche ist ein
                  Knopf – ein Tipp zeigt das Lied im Vollbild. -->

@@ -23,6 +23,9 @@ Microsoft.NET.Test.Sdk (MIT).
   Betrieb und hält sie nur lokal vor.
 - **iTunes Search API** (Apple) für Cover zum laufenden Lied. Auch hier wird
   nichts mitgeliefert.
+- **Die Prüfadresse von Windows** (`www.msftconnecttest.com`, seit Bau 22):
+  Spielt ein Sender nicht, fragt REGOradio sie ab, um eine WLAN-Anmeldeseite
+  zu erkennen – dieselbe Adresse, die Windows dafür ohnehin ständig fragt.
 - **Die Homepages der Sender** (seit Bau 15): Hat ein Sender im Verzeichnis
   kein Logo, liest REGOradio den Kopf seiner Homepage und nimmt das Symbol,
   das die Seite selbst angibt.
