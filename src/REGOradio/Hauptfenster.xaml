@@ -331,6 +331,11 @@
                          Text="Ziehen ordnet um. Die ersten acht liegen auf dem Hauptschirm. Langes Drücken nimmt einen Sender herunter." />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <!-- Bau 19: alle Tasten samt Logos in eine Datei, und zurück. -->
+              <Button Style="{StaticResource Taste}" Content="Sichern" Margin="0,0,12,0" Click="TastenSichern"
+                      ToolTip="Alle Stationstasten mit ihren Logos in eine Datei schreiben" />
+              <Button Style="{StaticResource Taste}" Content="Einlesen" Margin="0,0,12,0" Click="TastenEinlesen"
+                      ToolTip="Stationstasten aus einer gesicherten Datei übernehmen" />
               <Button Style="{StaticResource Haupttaste}" Click="SucheOeffnen" Margin="0,0,12,0">
                 <StackPanel Orientation="Horizontal">
                   <Path Style="{StaticResource Symbol}" Data="{StaticResource IconSuche}" StrokeThickness="2.2" />
