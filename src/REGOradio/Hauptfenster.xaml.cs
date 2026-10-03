@@ -591,6 +591,9 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     {
         _laufender = sender;
         _zuletzt = sender;
+        // Wer selbst wählt, beendet eine laufende Suche nach Ersatz.
+        _heilung = null;
+        _hinweis = "";
         _einstellungen.LetzterPlatz = sender.Platz;
         _ablage.EinstellungenSchreiben(_einstellungen);
         _abspieler.Spiele(sender.Adresse, sender.Name);
@@ -619,8 +622,8 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         // läuft: Der Wachzustand hängt an dem Faden, der ihn setzt.
         Wachhalter.Setzen(stand.Laeuft && _einstellungen.KeinRuhezustand);
 
-        FehlerZeile.Text = stand.Fehler;
-        FehlerZeile.Visibility = stand.Fehler.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        FehlerBeachten(stand);
+        FehlerzeileZeigen(stand.Fehler);
         LaufendesZeigen();
         if (stand.Titel != _titelGezeigt)
         {
