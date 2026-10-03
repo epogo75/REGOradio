@@ -165,6 +165,9 @@ public sealed class Einstellungen
     /// </summary>
     public string FernSchluessel { get; set; } = "";
 
+    /// <summary>Ob nach dem Einschlafen auch der Bildschirm ausgeht (Bau 24).</summary>
+    public bool SchlafBildschirmAus { get; set; } = true;
+
     /// <summary>„Alle Sender gleich laut" (Bau 21).</summary>
     public bool Angleichen { get; set; } = true;
 

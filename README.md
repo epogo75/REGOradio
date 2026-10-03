@@ -9,7 +9,7 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 23 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 24 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
@@ -26,7 +26,7 @@ Bau 23 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 * im Feld „Läuft“ wischen: nach links der nächste, nach rechts der vorige Sender (seit Bau 23)
 * Hotel-WLAN: verlangt das WLAN eine Anmeldung im Browser, sagt REGOradio das, bietet „WLAN-Anmeldung öffnen“ an und spielt nach der Anmeldung von selbst weiter (seit Bau 22)
 * alle Sender gleich laut: die Lautheit jedes Senders wird beim Hören nach EBU R 128 gemessen, am Sender gemerkt und auf −17 LUFS angeglichen (höchstens −12/+6 dB, langsam nachgeführt); abschaltbar im Blatt „Ton geht an“ (seit Bau 21)
-* Einschlafen (15–90 Minuten, die letzte Minute wird leiser) und Wecker (Uhrzeit, täglich/Mo–Fr/einmal, Stationstaste; fängt leise an und wird in zwei Minuten lauter). Schläft der Rechner, weckt ihn eine geplante Aufgabe von Windows eine Minute vorher – soweit die Energieoptionen das zulassen (seit Bau 20)
+* Einschlafen (15–90 Minuten, die letzte Minute wird leiser, danach geht auf Wunsch auch der Bildschirm aus – seit Bau 24) und Wecker (Uhrzeit, täglich/Mo–Fr/einmal, Stationstaste; fängt leise an und wird in zwei Minuten lauter). Schläft der Rechner, weckt ihn eine geplante Aufgabe von Windows eine Minute vorher – soweit die Energieoptionen das zulassen (seit Bau 20)
 * Stationstasten sichern und einlesen, mit Logos, als eine Datei `*.regoradio` – unter „Mehr“; beim Einlesen werden die bisherigen Tasten ersetzt und vorher selbst gesichert (seit Bau 19)
 * „Was lief vorhin?“: die letzten 50 Lieder mit Uhrzeit, Cover und Sender, auch nach einem Neustart; vierte Taste links (seit Bau 18)
 * tote Sender repariert es selbst: reißt der Strom ab, wird einmal neu verbunden; spielt ein Sender gar nicht, sucht REGOradio im Verzeichnis seine neue Adresse und legt sie auf die Taste, sobald sie spielt (seit Bau 17)
