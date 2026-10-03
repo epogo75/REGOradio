@@ -597,9 +597,11 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         LautheitMerken();
         _laufender = sender;
         _zuletzt = sender;
-        // Wer selbst wählt, beendet eine laufende Suche nach Ersatz.
+        // Wer selbst wählt, beendet eine laufende Suche nach Ersatz – und das
+        // Warten auf die WLAN-Anmeldung; scheitert es wieder, wird neu geprüft.
         _heilung = null;
         _hinweis = "";
+        AnmeldungErledigt();
         _einstellungen.LetzterPlatz = sender.Platz;
         _ablage.EinstellungenSchreiben(_einstellungen);
         _abspieler.Spiele(sender.Adresse, sender.Name, sender.Lautheit);
@@ -610,6 +612,8 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     private void Stoppen(object absender, RoutedEventArgs e)
     {
         LautheitMerken();
+        AnmeldungErledigt();
+        _hinweis = "";
         _abspieler.Stopp();
         _laufender = null;
         _einstellungen.LetzterPlatz = 0;
