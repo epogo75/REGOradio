@@ -1015,9 +1015,12 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         VollbildAus();
     }
 
-    /// <summary>Die 110 Buchstaben einmal anlegen; danach wechselt nur die Farbe.</summary>
+    /// <summary>Die Buchstaben einmal anlegen; danach wechselt nur die Farbe.
+    /// Die Maße kommen aus dem Feld selbst, nicht aus der .xaml.</summary>
     private void WortfeldAnlegen()
     {
+        Wortfeld.Rows = Wortuhr.Zeilen;
+        Wortfeld.Columns = Wortuhr.Spalten;
         foreach (var zeile in Wortuhr.Feld)
         {
             foreach (var buchstabe in zeile)
@@ -1054,7 +1057,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         for (var i = 0; i < Wortfeld.Children.Count; i++)
         {
             var feld = (TextBlock)Wortfeld.Children[i];
-            feld.Foreground = an.Contains((i / 12, i % 12)) ? hell : dunkel;
+            feld.Foreground = an.Contains((i / Wortuhr.Spalten, i % Wortuhr.Spalten)) ? hell : dunkel;
         }
         Uhrebene.ToolTip = Wortuhr.Satz(DateTime.Now);
         System.Windows.Automation.AutomationProperties.SetName(Uhrebene, Wortuhr.Satz(DateTime.Now));

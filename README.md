@@ -9,7 +9,7 @@ wenn das Fenster zu ist.
 
 ## Stand
 
-Bau 24 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
+Bau 25 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 * acht Stationstasten mit Senderlogos, dazu „Mehr“ mit 24 Plätzen, dort per Ziehen umzuordnen
 * Sendersuche im Verzeichnis, „Anhören" und „Auf Taste legen" getrennt
@@ -37,13 +37,11 @@ Bau 24 läuft auf einem Dell 7320 mit Touchscreen unter Windows 11:
 
 ## Installieren
 
-Seit Bau 11 gibt es einen Installer: **`REGOradio-Setup-NN.exe`**, auf der NAS unter `Z:\REGOradio\installer`. Er installiert je Benutzer nach `%LOCALAPPDATA%\Programs\REGOradio`, ohne Administratorrechte, bringt die .NET-Laufzeit mit und legt Verknüpfungen in Startmenü und auf dem Schreibtisch an. Ein Update ist derselbe Installer noch einmal; läuft REGOradio dabei (auch nur im Tray), bittet er erst ums Beenden.
+Seit Bau 11 gibt es einen Installer: **`REGOradio-Setup-NN.exe`**, unter [Releases](https://github.com/epogo75/REGOradio/releases/latest). Er installiert je Benutzer nach `%LOCALAPPDATA%\Programs\REGOradio`, ohne Administratorrechte, bringt die .NET-Laufzeit mit und legt Verknüpfungen in Startmenü und auf dem Schreibtisch an. Ein Update ist derselbe Installer noch einmal; läuft REGOradio dabei (auch nur im Tray), bittet er erst ums Beenden.
 
 * Eine alte Einzeldatei (`REGOradio-x64*.exe`) im selben Ordner räumt er weg; ein eingeschalteter Autostart zeigt danach auf die neue Datei.
 * Beim Entfernen bleiben Stationstasten und Einstellungen unter `%APPDATA%\REGOradio` stehen; der Autostart-Eintrag geht mit weg.
 * Installer und Programm sind nicht signiert, deshalb warnt Windows SmartScreen beim ersten Start („Weitere Informationen“ → „Trotzdem ausführen“).
-
-Die beiden Einzeldateien unter [Releases](https://github.com/epogo75/REGOradio/releases) stammen aus der Zeit davor.
 
 Wer die Handy-Fernbedienung einschaltet, wird von der Windows-Firewall gefragt. Wer dort versehentlich ablehnt, schaltet den Schalter aus und wieder an: REGOradio richtet die Freigabe dann selbst ein.
 

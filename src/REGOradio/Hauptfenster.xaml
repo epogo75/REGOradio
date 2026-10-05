@@ -901,7 +901,7 @@
     <Grid x:Name="Uhrebene" Visibility="Collapsed" Background="#0A0B0C"
           MouseLeftButtonUp="WortuhrSchliessen">
       <Viewbox Margin="48,40,48,56">
-        <UniformGrid x:Name="Wortfeld" Rows="11" Columns="12" />
+        <UniformGrid x:Name="Wortfeld" />
       </Viewbox>
     </Grid>
 
