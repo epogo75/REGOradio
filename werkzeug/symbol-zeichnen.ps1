@@ -8,9 +8,14 @@
 # die .ico daneben ist nur sein Ergebnis und wird mit eingecheckt, damit der
 # Bau ohne diesen Schritt auskommt.
 #
-# Der Entwurf steht im Mockup (Tafel „Programmsymbol"): grüner Grund mit
-# runden Ecken, zwei Funkbögen, ein Punkt. Unter 32 Pixeln fällt der äußere
-# Bogen weg -- bei 16 Pixeln laufen zwei Bögen zu einem grauen Fleck zusammen.
+# Der Entwurf stand im Mockup (Tafel „Programmsymbol"): runde Ecken, zwei
+# Funkbögen, ein Punkt. Unter 32 Pixeln fällt der äußere Bogen weg -- bei 16
+# Pixeln laufen zwei Bögen zu einem grauen Fleck zusammen.
+#
+# SEIT BAU 28 IM REGO-STIL (Stephan: „das icon und der installer an die neue
+# designsprache"): dunkle Kachel wie REGOglt, der Punkt in Minze, der innere
+# Bogen violett, der äußere in Koralle - die Farben der Bausteine von
+# regotools.de. Vorher grüner Grund mit weißer Zeichnung.
 #
 # Jede Größe wird einzeln gezeichnet statt aus 256 Pixeln verkleinert:
 # Verkleinerte Symbole werden matschig, gerade die Strichstärke.
@@ -19,8 +24,10 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
 $ziel = Join-Path $PSScriptRoot '..\src\REGOradio\symbol.ico'
-$akzent = [System.Drawing.Color]::FromArgb(255, 31, 111, 92)   # #1F6F5C, wie in Tag.xaml
-$weiss = [System.Drawing.Color]::White
+$akzent = [System.Drawing.Color]::FromArgb(255, 0x16, 0x1B, 0x2E)   # Kachel #161B2E wie REGOglt
+$minze = [System.Drawing.Color]::FromArgb(255, 0x00, 0xD9, 0xA3)    # Punkt
+$violett = [System.Drawing.Color]::FromArgb(255, 0x7C, 0x5C, 0xFF)  # innerer Bogen
+$koralle = [System.Drawing.Color]::FromArgb(255, 0xFF, 0x6B, 0x6B)  # äußerer Bogen
 
 function Bild([int]$groesse) {
     $bild = New-Object System.Drawing.Bitmap $groesse, $groesse
@@ -66,22 +73,25 @@ function Bild([int]$groesse) {
     } elseif ($groesse -le 32) {
         $strich = 3.2
     }
-    $stift = New-Object System.Drawing.Pen $weiss, $strich
-    $stift.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $stift.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+    function Stift($farbe) {
+        $p = New-Object System.Drawing.Pen $farbe, $strich
+        $p.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $p.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $p
+    }
 
     # Innerer Bogen.
-    $g.DrawArc($stift, $mx - $r1, $my - $r1, 2 * $r1, 2 * $r1, 270, 90)
+    $g.DrawArc((Stift $violett), $mx - $r1, $my - $r1, 2 * $r1, 2 * $r1, 270, 90)
 
     # Äußerer Bogen, Radius 112 -- erst ab 32 Pixeln.
     if ($groesse -ge 32) {
         $r2 = 112 * $m
-        $g.DrawArc($stift, $mx - $r2, $my - $r2, 2 * $r2, 2 * $r2, 270, 90)
+        $g.DrawArc((Stift $koralle), $mx - $r2, $my - $r2, 2 * $r2, 2 * $r2, 270, 90)
     }
 
     # Der Punkt.
-    $weissPinsel = New-Object System.Drawing.SolidBrush $weiss
-    $g.FillEllipse($weissPinsel, $mx - $pr, $my - $pr, 2 * $pr, 2 * $pr)
+    $punktPinsel = New-Object System.Drawing.SolidBrush $minze
+    $g.FillEllipse($punktPinsel, $mx - $pr, $my - $pr, 2 * $pr, 2 * $pr)
 
     $g.Dispose()
     return $bild

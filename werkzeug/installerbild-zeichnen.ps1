@@ -24,22 +24,57 @@
 # einmal: Sperrung 0,06 der Schriftgroesse, "REGO" Light, "radio" Bold im
 # Akzent; der Schein ist weichgezeichnet durch Verkleinern und Vergroessern.
 # Wer den Schriftzug aendert, aendert ihn hier mit.
+#
+# SEIT BAU 28 IM REGO-STIL (Thema "REGO", wie regotools.de): nachtblauer
+# Grund mit den vier Leuchtflecken der Webseite, oben die Bausteine, der
+# Schriftzug in Outfit ExtraBold - "REGO" hell, "radio" violett, eng statt
+# gesperrt -, unten die Senderskala mit dem Zeiger in Minze. Outfit kommt
+# ueber eine PrivateFontCollection aus src\REGOradio\Schriften, damit das Bild
+# ohne installierte Schrift entsteht.
 
 param([string]$Png)
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
-# Farben von Standard-Nacht (Stil\Themen\Standard-Nacht.xaml).
+# Farben von Rego-Nacht (Stil\Themen\Rego-Nacht.xaml).
 function Farbe([string]$hex, [int]$alpha = 255) {
     $c = [System.Drawing.ColorTranslator]::FromHtml($hex)
     [System.Drawing.Color]::FromArgb($alpha, $c.R, $c.G, $c.B)
 }
-$grund   = Farbe '#0E0F10'
-$flaeche = Farbe '#17191A'
-$tinte   = Farbe '#ECEAE6'
-$tinte2  = Farbe '#A7A39A'
-$akzent  = Farbe '#5FA790'
+$grund   = Farbe '#0A0C14'
+$flaeche = Farbe '#121729'
+$tinte   = Farbe '#F1F3F9'
+$tinte2  = Farbe '#A3A9BB'
+$akzent  = Farbe '#00D9A3'
+$violett = Farbe '#7C5CFF'
+
+$schriften = New-Object System.Drawing.Text.PrivateFontCollection
+foreach ($datei in 'Outfit-ExtraBold.ttf', 'Outfit-Regular.ttf') {
+    $schriften.AddFontFile([System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\src\REGOradio\Schriften\$datei")))
+}
+$outfitFett = $schriften.Families | Where-Object { $_.Name -like '*ExtraBold*' } | Select-Object -First 1
+$outfit     = $schriften.Families | Where-Object { $_.Name -eq 'Outfit' } | Select-Object -First 1
+if (-not $outfitFett -or -not $outfit) { throw "Outfit nicht geladen: $(($schriften.Families | ForEach-Object Name) -join ', ')" }
+
+# Ein weicher Leuchtfleck wie body::before auf regotools.de.
+function Fleck($g, [double]$mx, [double]$my, [double]$r, [string]$hex, [int]$alpha) {
+    $kreis = New-Object System.Drawing.Drawing2D.GraphicsPath
+    $kreis.AddEllipse(($mx - $r), ($my - $r), (2 * $r), (2 * $r))
+    $pinsel = New-Object System.Drawing.Drawing2D.PathGradientBrush $kreis
+    $pinsel.CenterColor = Farbe $hex $alpha
+    $pinsel.SurroundColors = @((Farbe $hex 0))
+    $g.FillPath($pinsel, $kreis)
+}
+
+function Kachel($g, [double]$x, [double]$y, [double]$k, [double]$r, $farbe) {
+    $p = New-Object System.Drawing.Drawing2D.GraphicsPath
+    $d = 2 * $r
+    $p.AddArc($x, $y, $d, $d, 180, 90); $p.AddArc($x + $k - $d, $y, $d, $d, 270, 90)
+    $p.AddArc($x + $k - $d, $y + $k - $d, $d, $d, 0, 90); $p.AddArc($x, $y + $k - $d, $d, $d, 90, 90)
+    $p.CloseFigure()
+    $g.FillPath((New-Object System.Drawing.SolidBrush $farbe), $p)
+}
 
 function Leinwand([int]$b, [int]$h) {
     $bild = New-Object System.Drawing.Bitmap $b, $h, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
@@ -83,38 +118,44 @@ function Zeichnen([int]$prozent) {
     $verlauf = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 0, $breite, $hoehe), $flaeche, $grund, 90.0
     $g.FillRectangle($verlauf, 0, 0, $breite, $hoehe)
 
-    # Das Gluehen oben rechts, wie im Blatt "Ueber REGOradio".
-    $kreis = New-Object System.Drawing.Drawing2D.GraphicsPath
-    $kreis.AddEllipse(($breite - 190 * $f), (-190 * $f), (380 * $f), (380 * $f))
-    $glut = New-Object System.Drawing.Drawing2D.PathGradientBrush $kreis
-    $glut.CenterColor = Farbe '#5FA790' 70
-    $glut.SurroundColors = @((Farbe '#5FA790' 0))
-    $g.FillPath($glut, $kreis)
+    # Die vier Leuchtflecken der Webseite: Minze oben links, Violett oben
+    # rechts, Koralle unten rechts, Gelb unten links.
+    Fleck $g (0.20 * $breite) (0.24 * $hoehe) (0.75 * $breite) '#00D9A3' 60
+    Fleck $g (0.85 * $breite) (0.30 * $hoehe) (0.80 * $breite) '#7C5CFF' 80
+    Fleck $g (0.70 * $breite) (0.86 * $hoehe) (0.70 * $breite) '#FF6B6B' 40
+    Fleck $g (0.24 * $breite) (0.80 * $hoehe) (0.65 * $breite) '#FFC93C' 30
+
+    $x0 = 22.0 * $f
+
+    # ---- Die Bausteine (viewBox 48 wie auf regotools.de) ---------------------
+    $bk = 44.0 * $f / 48.0
+    $bx = $x0; $by = 40.0 * $f
+    Kachel $g ($bx + 3 * $bk) ($by + 3 * $bk) (19 * $bk) (6 * $bk) (Farbe '#00D9A3')
+    Kachel $g ($bx + 26 * $bk) ($by + 3 * $bk) (19 * $bk) (6 * $bk) (Farbe '#FFC93C')
+    Kachel $g ($bx + 3 * $bk) ($by + 26 * $bk) (19 * $bk) (6 * $bk) (Farbe '#FF6B6B')
+    $g.FillEllipse((New-Object System.Drawing.SolidBrush (Farbe '#7C5CFF')), ($bx + 26 * $bk), ($by + 26 * $bk), (19 * $bk), (19 * $bk))
 
     # ---- Der Schriftzug ------------------------------------------------------
-    $gr = 34.0 * $f
-    $x0 = 22.0 * $f; $y0 = 54.0 * $f
-    $duenn = New-Object System.Drawing.Font 'Segoe UI Light', $gr, ([System.Drawing.FontStyle]::Regular), ([System.Drawing.GraphicsUnit]::Pixel)
-    $fett  = New-Object System.Drawing.Font 'Segoe UI', $gr, ([System.Drawing.FontStyle]::Bold), ([System.Drawing.GraphicsUnit]::Pixel)
+    $gr = 33.0 * $f
+    $y0 = 104.0 * $f
+    $fett  = New-Object System.Drawing.Font $outfitFett, $gr, ([System.Drawing.FontStyle]::Regular), ([System.Drawing.GraphicsUnit]::Pixel)
     $genau = [System.Drawing.StringFormat]::GenericTypographic
 
-    $pinselTinte = New-Object System.Drawing.SolidBrush $tinte
-    $x = $x0
-    foreach ($zeichen in 'R', 'E', 'G', 'O') {
-        $g.DrawString($zeichen, $duenn, $pinselTinte, $x, $y0, $genau)
-        $x += $g.MeasureString($zeichen, $duenn, 1000, $genau).Width + $gr * 0.06
-    }
+    $g.DrawString('REGO', $fett, (New-Object System.Drawing.SolidBrush $tinte), $x0, $y0, $genau)
+    $x = $x0 + $g.MeasureString('REGO', $fett, 1000, $genau).Width + $gr * 0.005
 
-    # "radio" erst auf eine eigene Lage, daraus zwei Scheine: weit und eng.
+    # "radio" erst auf eine eigene Lage, daraus EIN enger Schein. Der weite
+    # Hof des alten Bilds machte das kraeftige Violett auf dem dunklen Grund
+    # zu einem verschwommenen Fleck.
     $lage, $gl = Leinwand $breite $hoehe
-    $gl.DrawString('radio', $fett, (New-Object System.Drawing.SolidBrush $akzent), $x, $y0, $genau)
+    $gl.TextRenderingHint = 'AntiAlias'
+    $gl.DrawString('radio', $fett, (New-Object System.Drawing.SolidBrush $violett), $x, $y0, $genau)
     $gl.Dispose()
-    Deckend $g (Weich $lage (6 * $f))
-    Deckend $g (Weich $lage (3 * $f))
+    Deckend $g (Weich $lage (2.5 * $f))
     Deckend $g $lage
 
     # ---- Untertitel ------------------------------------------------------------
-    $klein = New-Object System.Drawing.Font 'Segoe UI', (17 * $f), ([System.Drawing.FontStyle]::Regular), ([System.Drawing.GraphicsUnit]::Pixel)
+    $klein = New-Object System.Drawing.Font $outfit, (17 * $f), ([System.Drawing.FontStyle]::Regular), ([System.Drawing.GraphicsUnit]::Pixel)
     $ue = [string][char]0xFC
     $g.DrawString("Internetradio`nf${ue}r den Finger", $klein, (New-Object System.Drawing.SolidBrush $tinte2), ($x0 + $f), ($y0 + $gr + 22 * $f))
 
@@ -123,7 +164,7 @@ function Zeichnen([int]$prozent) {
     for ($i = 0; $i -le 17; $i++) {
         $sx = (22 + $i * 12) * $f
         $lang = ($i % 4) -eq 0
-        $stift = New-Object System.Drawing.Pen (Farbe '#ECEAE6' $(if ($lang) { 115 } else { 64 })), ($(if ($lang) { 2 } else { 1.4 }) * $f)
+        $stift = New-Object System.Drawing.Pen (Farbe '#F1F3F9' $(if ($lang) { 115 } else { 64 })), ($(if ($lang) { 2 } else { 1.4 }) * $f)
         $g.DrawLine($stift, $sx, ($unten + $(if ($lang) { 10 } else { 20 }) * $f), $sx, ($unten + 32 * $f))
     }
     $zeigerLage, $gz = Leinwand $breite $hoehe

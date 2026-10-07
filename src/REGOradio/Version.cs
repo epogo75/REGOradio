@@ -14,7 +14,7 @@ namespace REGOradio;
 internal static class Bau
 {
     public const string Version = "0.1";
-    public const int Nummer = 27;
+    public const int Nummer = 28;
     public const string Stand = "2026-10-07";
 
     public const string Programm = "REGOradio";
