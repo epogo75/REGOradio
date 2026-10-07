@@ -173,6 +173,15 @@ Section "Programm" Hauptteil
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
   WriteRegDWORD HKCU "${SCHLUESSEL}" "EstimatedSize" "$0"
+
+  ; SYMBOLE NEU LESEN LASSEN. Der Explorer merkt sich Symbole je Pfad, und der
+  ; Pfad bleibt beim Update derselbe -- nach Bau 28 zeigte die Verknüpfung auf
+  ; dem Desktop noch das alte Symbol, bis der Zwischenspeicher von Hand geleert
+  ; war. Erst EXE und Verknüpfung als geändert melden (SHCNE_UPDATEITEM,
+  ; SHCNF_PATHW), dann "Zuordnungen geändert" (SHCNE_ASSOCCHANGED, SHCNF_FLUSH).
+  System::Call 'shell32::SHChangeNotify(i 0x2000, i 0x0005, w "$INSTDIR\REGOradio.exe", p 0)'
+  System::Call 'shell32::SHChangeNotify(i 0x2000, i 0x0005, w "$DESKTOP\${NAME}.lnk", p 0)'
+  System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0x1000, p 0, p 0)'
 SectionEnd
 
 Section "Uninstall"
