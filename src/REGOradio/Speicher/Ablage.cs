@@ -52,8 +52,26 @@ public sealed class Ablage
 
     public void VerlaufSchreiben(List<Gespielt> verlauf) => Schreiben(VerlaufDatei, verlauf);
 
-    public Einstellungen EinstellungenLesen() =>
-        Lesen<Einstellungen>(EinstellungenDatei) ?? new Einstellungen();
+    public Einstellungen EinstellungenLesen()
+    {
+        var einstellungen = Lesen<Einstellungen>(EinstellungenDatei) ?? new Einstellungen();
+
+        // Das Thema REGO einmal einführen (Bau 27) - und gleich merken, damit
+        // es beim nächsten Start nicht wieder umschaltet.
+        if (einstellungen.RegoEinfuehren())
+        {
+            try
+            {
+                EinstellungenSchreiben(einstellungen);
+            }
+            catch (Exception fehler) when (fehler is IOException or UnauthorizedAccessException)
+            {
+                // Dann beim nächsten Speichern - das Thema gilt trotzdem.
+            }
+        }
+
+        return einstellungen;
+    }
 
     public void EinstellungenSchreiben(Einstellungen einstellungen) =>
         Schreiben(EinstellungenDatei, einstellungen);
@@ -147,10 +165,29 @@ public sealed class Einstellungen
     /// hat eine Tag- und eine Nachtfassung; welche gilt, entscheidet
     /// `Darstellung`.
     ///
-    /// Vorgabe seit Bau 26 „rego", der Stil der REGO-Familie. Wer schon eine
-    /// Einstellungsdatei hat, behält sein Thema - dort steht es ausdrücklich.
+    /// Vorgabe seit Bau 26 „rego", der Stil der REGO-Familie.
     /// </summary>
     public string Thema { get; set; } = "rego";
+
+    /// <summary>
+    /// Ob das Thema REGO schon einmal eingeführt wurde (Bau 27).
+    ///
+    /// Bau 26 hat bestehende Installationen beim alten Thema gelassen - und
+    /// dann sah das Update aus wie der alte Bau ("der build ist der alte").
+    /// Jetzt schaltet ein Update genau einmal auf REGO; wer danach zurück
+    /// auf sein Thema geht, bleibt dort. Fehlt das Feld in einer alten
+    /// Datei, ist es false - genau dann wird umgestellt.
+    /// </summary>
+    public bool RegoEingefuehrt { get; set; }
+
+    /// <summary>Einmal auf REGO umstellen. True, wenn umgestellt wurde.</summary>
+    public bool RegoEinfuehren()
+    {
+        if (RegoEingefuehrt) return false;
+        Thema = "rego";
+        RegoEingefuehrt = true;
+        return true;
+    }
 
     /// <summary>
     /// Ob die Handy-Fernbedienung läuft. Aus, bis jemand sie einschaltet: Ein

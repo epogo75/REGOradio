@@ -44,6 +44,24 @@ public class ThemenPruefung
         }
     }
 
+    /// <summary>
+    /// Ein Update stellt genau einmal auf REGO um (Bau 27) - wer danach sein
+    /// altes Thema wieder wählt, bleibt dabei.
+    /// </summary>
+    [Fact]
+    public void RegoWirdEinmalEingefuehrt()
+    {
+        var alt = System.Text.Json.JsonSerializer.Deserialize<REGOradio.Speicher.Einstellungen>("{\"Thema\":\"neon\"}")!;
+        Assert.False(alt.RegoEingefuehrt);
+
+        Assert.True(alt.RegoEinfuehren());
+        Assert.Equal("rego", alt.Thema);
+
+        alt.Thema = "neon";
+        Assert.False(alt.RegoEinfuehren());
+        Assert.Equal("neon", alt.Thema);
+    }
+
     [Fact]
     public void AlleTafelnHabenDieselbenSchluessel()
     {
