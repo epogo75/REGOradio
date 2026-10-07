@@ -1,0 +1,82 @@
+<!--
+  REGO, Tag (Bau 26). Dieselbe Familie bei Tageslicht: helles Blaugrau, weiße
+  Karten, die Minze etwas dunkler, damit sie auf Weiß noch lesbar ist. Die
+  Leuchtflecken bleiben, nur leiser. (regotools.de selbst ist nur dunkel –
+  REGOradio braucht den Tag, es steht im Hotelzimmer auch mittags.)
+
+  Alle Tafeln unter Stil/Themen haben dieselben Schlüssel – nur so lässt sich
+  umschalten, ohne die Oberfläche anzufassen. `ThemenPruefung` wacht darüber.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="Grund" Color="#F3F5FA" />
+  <SolidColorBrush x:Key="Flaeche" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Flaeche2" Color="#EBEEF6" />
+  <SolidColorBrush x:Key="Linie" Color="#DCE1EC" />
+  <SolidColorBrush x:Key="LinieStark" Color="#C2C9DA" />
+  <SolidColorBrush x:Key="Tinte" Color="#141826" />
+  <SolidColorBrush x:Key="Tinte2" Color="#4A5266" />
+  <SolidColorBrush x:Key="Tinte3" Color="#6B7385" />
+  <SolidColorBrush x:Key="Akzent" Color="#00A87E" />
+  <SolidColorBrush x:Key="AkzentWeich" Color="#D5F4EC" />
+  <SolidColorBrush x:Key="AkzentTinte" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Warnung" Color="#E5484D" />
+
+  <!-- Bei Tag kein Schein: auf Weiß sähe er wie ein Schmutzrand aus. -->
+  <x:Null x:Key="Leuchten" />
+
+  <FontFamily x:Key="Schrift">pack://application:,,,/Schriften/#Outfit</FontFamily>
+
+  <DrawingBrush x:Key="Hintergrund" Stretch="Fill">
+    <DrawingBrush.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#F3F5FA">
+          <GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,100,100" /></GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing>
+          <GeometryDrawing.Brush>
+            <RadialGradientBrush Center="0.20,0.24" GradientOrigin="0.20,0.24" RadiusX="0.42" RadiusY="0.55">
+              <GradientStop Color="#2200D9A3" Offset="0" />
+              <GradientStop Color="#0000D9A3" Offset="1" />
+            </RadialGradientBrush>
+          </GeometryDrawing.Brush>
+          <GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,100,100" /></GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing>
+          <GeometryDrawing.Brush>
+            <RadialGradientBrush Center="0.82,0.28" GradientOrigin="0.82,0.28" RadiusX="0.45" RadiusY="0.6">
+              <GradientStop Color="#227C5CFF" Offset="0" />
+              <GradientStop Color="#007C5CFF" Offset="1" />
+            </RadialGradientBrush>
+          </GeometryDrawing.Brush>
+          <GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,100,100" /></GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing>
+          <GeometryDrawing.Brush>
+            <RadialGradientBrush Center="0.70,0.86" GradientOrigin="0.70,0.86" RadiusX="0.4" RadiusY="0.5">
+              <GradientStop Color="#18FF6B6B" Offset="0" />
+              <GradientStop Color="#00FF6B6B" Offset="1" />
+            </RadialGradientBrush>
+          </GeometryDrawing.Brush>
+          <GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,100,100" /></GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing>
+          <GeometryDrawing.Brush>
+            <RadialGradientBrush Center="0.24,0.80" GradientOrigin="0.24,0.80" RadiusX="0.38" RadiusY="0.48">
+              <GradientStop Color="#1AFFC93C" Offset="0" />
+              <GradientStop Color="#00FFC93C" Offset="1" />
+            </RadialGradientBrush>
+          </GeometryDrawing.Brush>
+          <GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,100,100" /></GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingBrush.Drawing>
+  </DrawingBrush>
+
+  <SolidColorBrush x:Key="Schriftzugfarbe" Color="#6A4CF0" />
+  <FontWeight x:Key="SchriftzugREGO">ExtraBold</FontWeight>
+  <FontWeight x:Key="SchriftzugRadio">ExtraBold</FontWeight>
+  <Visibility x:Key="Bausteine">Visible</Visibility>
+
+</ResourceDictionary>

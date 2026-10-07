@@ -37,7 +37,7 @@ public class ThemenPruefung
     public void JedesThemaHatTagUndNacht()
     {
         var dateien = Directory.GetFiles(Themenordner(), "*.xaml").Select(Path.GetFileNameWithoutExtension).ToHashSet();
-        foreach (var thema in new[] { "Standard", "Holiday", "Mitternacht", "Neon", "Neongruen", "Neonblau" })
+        foreach (var thema in new[] { "Rego", "Standard", "Holiday", "Mitternacht", "Neon", "Neongruen", "Neonblau" })
         {
             Assert.Contains($"{thema}-Tag", dateien);
             Assert.Contains($"{thema}-Nacht", dateien);

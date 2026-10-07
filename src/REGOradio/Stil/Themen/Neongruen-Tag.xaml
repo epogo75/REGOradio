@@ -23,4 +23,14 @@
   <!-- Kein Leuchten: Das bleibt Neon vorbehalten. -->
   <x:Null x:Key="Leuchten" />
 
+  <!-- Seit Bau 26 (Thema REGO): Schrift, Hintergrund und Schriftzug sind
+       Schlüssel der Tafel. Dieses Thema bleibt, wie es war: Segoe UI, glatter
+       Grund, „radio" im Akzent, keine Bausteine im Kopf. -->
+  <FontFamily x:Key="Schrift">Segoe UI Variable Display, Segoe UI</FontFamily>
+  <SolidColorBrush x:Key="Hintergrund" Color="#F0F5F2" />
+  <SolidColorBrush x:Key="Schriftzugfarbe" Color="#3F8A00" />
+  <FontWeight x:Key="SchriftzugREGO">Light</FontWeight>
+  <FontWeight x:Key="SchriftzugRadio">Bold</FontWeight>
+  <Visibility x:Key="Bausteine">Collapsed</Visibility>
+
 </ResourceDictionary>

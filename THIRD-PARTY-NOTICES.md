@@ -10,6 +10,12 @@ REGOradio selbst steht unter der MIT-Lizenz (`LICENSE`). In der ausgelieferten
 | System.Management, System.CodeDom, Microsoft.Win32.*, System.Drawing.Common, System.Security.* | MIT, © .NET Foundation and Contributors | https://github.com/dotnet/runtime |
 | .NET, WPF, ASP.NET Core (Kestrel) | MIT, © .NET Foundation and Contributors | https://github.com/dotnet |
 
+Die Schrift **Outfit** (Bau 26, Thema REGO) steckt als vier feste Schnitte
+(Light, Regular, SemiBold, ExtraBold) in der .exe: SIL Open Font License 1.1,
+Copyright 2021 The Outfit Project Authors
+(https://github.com/Outfitio/Outfit-Fonts). Der Lizenztext liegt im
+Programmordner als `Schriften/OFL-Outfit.txt`.
+
 Das Zahnrad-Symbol der Handyseite folgt dem Symbol „settings“ aus
 [Feather](https://github.com/feathericons/feather) (MIT, © 2013–2023 Cole Bemis).
 

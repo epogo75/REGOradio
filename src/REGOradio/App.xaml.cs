@@ -24,6 +24,8 @@ public partial class App : Application
     /// </summary>
     public static readonly Themenwahl[] Themen =
     [
+        // REGO (Bau 26): der Stil der Familie, Vorgabe für neue Installationen.
+        new("rego", "REGO", "#00A87E", "#00D9A3"),
         new("standard", "Standard", "#1F6F5C", "#5FA790"),
         new("holiday", "Holiday", "#B5561A", "#F2A24A"),
         new("mitternacht", "Mitternacht", "#2451B8", "#5CC8FF"),
@@ -92,6 +94,10 @@ public partial class App : Application
         // Die Titelleiste malt Windows, nicht WPF – sie folgt der neuen Tafel
         // nicht von selbst.
         Fensterkleid.Alle();
+
+        // Der Schriftzug rechnet seine Sperrung aus der Stärke der Schrift
+        // (Bau 26) – das ist kein Ressourcenverweis, er muss neu bauen.
+        Schriftzug.Alle();
     }
 
     /// <summary>

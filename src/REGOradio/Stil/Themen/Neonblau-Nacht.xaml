@@ -25,4 +25,14 @@
        es, damit man die Taste vom Bett aus findet. -->
   <DropShadowEffect x:Key="Leuchten" Color="#00EAFF" ShadowDepth="0" BlurRadius="36" Opacity="1" />
 
+  <!-- Seit Bau 26 (Thema REGO): Schrift, Hintergrund und Schriftzug sind
+       Schlüssel der Tafel. Dieses Thema bleibt, wie es war: Segoe UI, glatter
+       Grund, „radio" im Akzent, keine Bausteine im Kopf. -->
+  <FontFamily x:Key="Schrift">Segoe UI Variable Display, Segoe UI</FontFamily>
+  <SolidColorBrush x:Key="Hintergrund" Color="#04080E" />
+  <SolidColorBrush x:Key="Schriftzugfarbe" Color="#00EAFF" />
+  <FontWeight x:Key="SchriftzugREGO">Light</FontWeight>
+  <FontWeight x:Key="SchriftzugRadio">Bold</FontWeight>
+  <Visibility x:Key="Bausteine">Collapsed</Visibility>
+
 </ResourceDictionary>

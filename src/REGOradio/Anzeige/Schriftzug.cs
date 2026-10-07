@@ -37,14 +37,30 @@ public sealed class Schriftzug : Border
         nameof(Pulsiert), typeof(bool), typeof(Schriftzug),
         new FrameworkPropertyMetadata(true, (d, _) => ((Schriftzug)d).Bauen()));
 
+    // Alle Schriftzüge, damit ein Themenwechsel sie neu bauen kann (Bau 26).
+    // Schwach gehalten: ein geschlossenes Blatt soll nicht hier weiterleben.
+    private static readonly List<WeakReference<Schriftzug>> Lebende = new();
+
     public Schriftzug()
     {
         Background = Brushes.Transparent;
         SnapsToDevicePixels = true;
         // Für die Bedienungshilfe ein Wort, nicht neun Buchstaben.
         System.Windows.Automation.AutomationProperties.SetName(this, "REGOradio");
+        Lebende.Add(new WeakReference<Schriftzug>(this));
         Bauen();
     }
+
+    /// <summary>Nach einem Themenwechsel: Sperrung und Stärke hängen an der Tafel.</summary>
+    public static void Alle()
+    {
+        Lebende.RemoveAll(w => !w.TryGetTarget(out _));
+        foreach (var w in Lebende)
+            if (w.TryGetTarget(out var s)) s.Bauen();
+    }
+
+    private static T Tafel<T>(string schluessel, T vorgabe) =>
+        Application.Current?.TryFindResource(schluessel) is T wert ? wert : vorgabe;
 
     /// <summary>Die Schriftgröße in Punkten.</summary>
     public double Groesse
@@ -62,20 +78,27 @@ public sealed class Schriftzug : Border
     private void Bauen()
     {
         var g = Groesse;
-        var schrift = new FontFamily("Segoe UI Variable Display, Segoe UI");
         var reihe = new StackPanel { Orientation = Orientation.Horizontal };
+
+        // SCHRIFT, STÄRKE UND FARBE AUS DER TAFEL (Bau 26). Die alten Themen
+        // haben „REGO" dünn und gesperrt, „radio" fett im Akzent; das Thema
+        // REGO setzt beides kräftig in Outfit, „radio" violett wie auf
+        // regotools.de. Kräftige Buchstaben stehen eng - gesperrt sähen sie
+        // auseinandergefallen aus.
+        var staerke = Tafel("SchriftzugREGO", FontWeights.Light);
+        var sperrung = staerke.ToOpenTypeWeight() >= FontWeights.Bold.ToOpenTypeWeight() ? g * 0.005 : g * 0.06;
 
         foreach (var zeichen in "REGO")
         {
             var buchstabe = new TextBlock
             {
                 Text = zeichen.ToString(),
-                FontFamily = schrift,
                 FontSize = g,
-                FontWeight = FontWeights.Light,
-                Margin = new Thickness(0, 0, g * 0.06, 0),
+                Margin = new Thickness(0, 0, sperrung, 0),
                 VerticalAlignment = VerticalAlignment.Bottom,
             };
+            buchstabe.SetResourceReference(TextBlock.FontFamilyProperty, "Schrift");
+            buchstabe.SetResourceReference(TextBlock.FontWeightProperty, "SchriftzugREGO");
             buchstabe.SetResourceReference(TextBlock.ForegroundProperty, "Tinte");
             reihe.Children.Add(buchstabe);
         }
@@ -85,11 +108,11 @@ public sealed class Schriftzug : Border
             var t = new TextBlock
             {
                 Text = "radio",
-                FontFamily = schrift,
                 FontSize = g,
-                FontWeight = FontWeights.Bold,
             };
-            t.SetResourceReference(TextBlock.ForegroundProperty, "Akzent");
+            t.SetResourceReference(TextBlock.FontFamilyProperty, "Schrift");
+            t.SetResourceReference(TextBlock.FontWeightProperty, "SchriftzugRadio");
+            t.SetResourceReference(TextBlock.ForegroundProperty, "Schriftzugfarbe");
             return t;
         }
 

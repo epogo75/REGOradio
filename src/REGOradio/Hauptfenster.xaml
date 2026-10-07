@@ -5,8 +5,8 @@
         Title="REGOradio" Height="720" Width="1280"
         MinHeight="400" MinWidth="700"
         Icon="symbol.ico"
-        FontFamily="Segoe UI Variable Display, Segoe UI"
-        Background="{DynamicResource Grund}"
+        FontFamily="{DynamicResource Schrift}"
+        Background="{DynamicResource Hintergrund}"
         Foreground="{DynamicResource Tinte}"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized">
@@ -111,8 +111,20 @@
 
         <!-- Der Schriftzug (Bau 13). Kein Knopf: Antippen tut nichts, er
              sagt nur, wo man ist. -->
-        <anzeige:Schriftzug Grid.Column="0" Groesse="34"
-                            VerticalAlignment="Center" HorizontalAlignment="Left" />
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+          <!-- Die Bausteine von regotools.de (Bau 26), nur im Thema REGO
+               sichtbar: drei Kacheln und ein Kreis, viewBox 48 wie dort. -->
+          <Viewbox Width="38" Height="38" Margin="0,0,12,0" VerticalAlignment="Center"
+                   Visibility="{DynamicResource Bausteine}">
+            <Canvas Width="48" Height="48">
+              <Rectangle Canvas.Left="3" Canvas.Top="3" Width="19" Height="19" RadiusX="6" RadiusY="6" Fill="#00D9A3" />
+              <Rectangle Canvas.Left="26" Canvas.Top="3" Width="19" Height="19" RadiusX="6" RadiusY="6" Fill="#FFC93C" />
+              <Rectangle Canvas.Left="3" Canvas.Top="26" Width="19" Height="19" RadiusX="6" RadiusY="6" Fill="#FF6B6B" />
+              <Ellipse Canvas.Left="26" Canvas.Top="26" Width="19" Height="19" Fill="#7C5CFF" />
+            </Canvas>
+          </Viewbox>
+          <anzeige:Schriftzug Groesse="34" VerticalAlignment="Center" />
+        </StackPanel>
 
         <!-- Die Uhrzeit ganz rechts, und sie ist ein Knopf: Antippen zeigt die
              Wortuhr im Vollbild. Der negative Rand gleicht den Innenabstand
@@ -766,7 +778,11 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
               </Grid.RowDefinitions>
+              <TextBlock Grid.Row="5" FontSize="15" FontWeight="SemiBold" Text="Outfit" Margin="0,4,0,0" />
+              <TextBlock Grid.Row="5" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}" Margin="0,4,0,0"
+                         Text="die Schrift im Thema REGO · SIL OFL 1.1, © The Outfit Project Authors" />
               <TextBlock Grid.Row="0" FontSize="15" FontWeight="SemiBold" Text="NAudio" />
               <TextBlock Grid.Row="0" Grid.Column="2" FontSize="15" Foreground="{DynamicResource Tinte2}"
                          Text="der Ton · MIT, © Mark Heath" />

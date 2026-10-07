@@ -31,6 +31,11 @@
   <ItemGroup>
     <!-- Dasselbe Symbol als WPF-Ressource: für das Fenster und das Tray. -->
     <Resource Include="symbol.ico" />
+    <!-- Outfit (SIL OFL 1.1) für das Thema REGO (Bau 26): vier feste
+         Schnitte, WPF fasst sie zur Familie „Outfit" zusammen. Lizenz liegt
+         daneben und steht in THIRD-PARTY-NOTICES.md. -->
+    <Resource Include="Schriften\*.ttf" />
+    <None Include="Schriften\OFL-Outfit.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

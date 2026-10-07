@@ -146,8 +146,11 @@ public sealed class Einstellungen
     /// Das Farbthema, ein Schlüssel aus `App.Themen` ("standard", "neon", ...). Jedes
     /// hat eine Tag- und eine Nachtfassung; welche gilt, entscheidet
     /// `Darstellung`.
+    ///
+    /// Vorgabe seit Bau 26 „rego", der Stil der REGO-Familie. Wer schon eine
+    /// Einstellungsdatei hat, behält sein Thema - dort steht es ausdrücklich.
     /// </summary>
-    public string Thema { get; set; } = "standard";
+    public string Thema { get; set; } = "rego";
 
     /// <summary>
     /// Ob die Handy-Fernbedienung läuft. Aus, bis jemand sie einschaltet: Ein
