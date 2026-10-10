@@ -147,9 +147,9 @@ public sealed class Einstellungen
     public bool SchliessenFragen { get; set; } = true;
 
     /// <summary>
-    /// Ob der Rechner wach bleibt, solange Radio läuft. Abschaltbar, weil es
-    /// Leute gibt, die ihr Notebook abends bewusst mit laufendem Radio
-    /// einschlafen lassen wollen.
+    /// Ob der Rechner wach bleibt, solange REGOradio läuft - seit Bau 30 auch
+    /// ohne Radio (vorher nur, solange Radio lief). Abschaltbar, weil es Leute
+    /// gibt, die ihr Notebook abends bewusst einschlafen lassen wollen.
     /// </summary>
     public bool KeinRuhezustand { get; set; } = true;
 

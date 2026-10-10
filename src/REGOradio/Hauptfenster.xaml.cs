@@ -123,6 +123,9 @@ public partial class Hauptfenster : Window, IFernsteuerbar
             else if (Tonebene.Visibility == Visibility.Visible) TonSchliessen(this, e);
         };
         _uhr.Start();
+        // Bau 30: wach von Anfang an, nicht erst ab dem ersten Ton - auch im
+        // Tray nach dem Autostart, damit der Wecker ein waches Notebook findet.
+        Wachhalter.Setzen(_einstellungen.KeinRuhezustand);
         _speicheruhr.Tick += (_, _) =>
         {
             _speicheruhr.Stop();
@@ -627,11 +630,12 @@ public partial class Hauptfenster : Window, IFernsteuerbar
         var vorher = _laeuft;
         _laeuft = stand.Laeuft;
 
-        // KEIN RUHEZUSTAND, SOLANGE ETWAS LÄUFT -- sofern gewünscht. Windows
-        // zählt Tastendrücke, nicht Töne, und wer Radio hört, drückt nichts.
-        // Gesetzt wird das hier, weil diese Methode immer im Oberflächenfaden
-        // läuft: Der Wachzustand hängt an dem Faden, der ihn setzt.
-        Wachhalter.Setzen(stand.Laeuft && _einstellungen.KeinRuhezustand);
+        // KEIN RUHEZUSTAND -- sofern gewünscht. Windows zählt Tastendrücke, nicht
+        // Töne, und wer Radio hört, drückt nichts. Seit Bau 30 auch ohne Radio
+        // (Stephan: „auch ohne Radio wach“ - der Wecker soll das Notebook
+        // wach antreffen). Gesetzt wird das hier, weil diese Methode immer im
+        // Oberflächenfaden läuft: Das alte Flag hängt an dem Faden, der es setzt.
+        Wachhalter.Setzen(_einstellungen.KeinRuhezustand);
 
         FehlerBeachten(stand);
         FehlerzeileZeigen(stand.Fehler);
@@ -1357,7 +1361,7 @@ public partial class Hauptfenster : Window, IFernsteuerbar
     {
         _einstellungen.KeinRuhezustand = RuhezustandSchalter.IsChecked == true;
         _ablage.EinstellungenSchreiben(_einstellungen);
-        Wachhalter.Setzen(_laeuft && _einstellungen.KeinRuhezustand);
+        Wachhalter.Setzen(_einstellungen.KeinRuhezustand);
 
         if (ReferenceEquals(absender, AutostartSchalter))
         {
